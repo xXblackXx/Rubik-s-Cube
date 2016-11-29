@@ -1,0 +1,22 @@
+﻿  stdafx.cpp
+  RubikSolverCPP.cpp
+f:\kolia-3y\rubik'scube\rubiksolvercpp\rubiksolvercpp\utility.h(118): warning C4018: '<': signed/unsigned mismatch
+  RubikSolver.cpp
+f:\kolia-3y\rubik'scube\rubiksolvercpp\rubiksolvercpp\utility.h(118): warning C4018: '<': signed/unsigned mismatch
+  Moves.cpp
+f:\kolia-3y\rubik'scube\rubiksolvercpp\rubiksolvercpp\utility.h(118): warning C4018: '<': signed/unsigned mismatch
+  Face.cpp
+f:\kolia-3y\rubik'scube\rubiksolvercpp\rubiksolvercpp\utility.h(118): warning C4018: '<': signed/unsigned mismatch
+  Cubies.cpp
+f:\kolia-3y\rubik'scube\rubiksolvercpp\rubiksolvercpp\utility.h(118): warning C4018: '<': signed/unsigned mismatch
+f:\kolia-3y\rubik'scube\rubiksolvercpp\rubiksolvercpp\cubies.cpp(255): warning C4018: '<': signed/unsigned mismatch
+  Cube.cpp
+f:\kolia-3y\rubik'scube\rubiksolvercpp\rubiksolvercpp\utility.h(118): warning C4018: '<': signed/unsigned mismatch
+f:\kolia-3y\rubik'scube\rubiksolvercpp\rubiksolvercpp\cube.cpp(180): warning C4018: '<': signed/unsigned mismatch
+  Generating Code...
+f:\kolia-3y\rubik'scube\rubiksolvercpp\rubiksolvercpp\cube.cpp(85): warning C4715: 'Cube::getFace': not all control paths return a value
+f:\kolia-3y\rubik'scube\rubiksolvercpp\rubiksolvercpp\cube.cpp(187): warning C4715: 'Cube::getOrientation': not all control paths return a value
+f:\kolia-3y\rubik'scube\rubiksolvercpp\rubiksolvercpp\utility.h(252): warning C4715: 'colorToFaceLetter': not all control paths return a value
+f:\kolia-3y\rubik'scube\rubiksolvercpp\rubiksolvercpp\utility.h(48): warning C4715: 'charToCol': not all control paths return a value
+  RubikSolverCPP.vcxproj -> F:\KOLIA-3Y\rubik'sCube\RubikSolverCPP\Debug\RubikSolverCPP.exe
+  RubikSolverCPP.vcxproj -> F:\KOLIA-3Y\rubik'sCube\RubikSolverCPP\Debug\RubikSolverCPP.pdb (Full PDB)
