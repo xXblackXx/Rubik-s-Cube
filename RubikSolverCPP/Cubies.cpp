@@ -46,7 +46,7 @@ void Cubies::clockCycle(moves m)
 	if(m < 2)
 		for(int i = 0; i < 4; i++)
 		{
-			orientations[moveGen.moveTable[m][0]] = (orientations[moveGen.moveTable[m][0]] == 1)? 0 : 1;
+			orientations[moveGen.moveTable[m][i]] = (orientations[moveGen.moveTable[m][i]] == 1)? 0 : 1;
 		}
 
 	// corners
@@ -109,7 +109,7 @@ void Cubies::counterCycle(moves m)
 	if(m < 2)
 		for(int i = 0; i < 4; i++)
 		{
-			orientations[moveGen.moveTable[m][0]] = (orientations[moveGen.moveTable[m][0]] == 1)? 0 : 1;
+			orientations[moveGen.moveTable[m][i]] = (orientations[moveGen.moveTable[m][i]] == 1)? 0 : 1;
 		}
 	
 
