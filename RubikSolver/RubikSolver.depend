@@ -1,0 +1,80 @@
+# depslib dependency file v1.0
+1481402182 source:f:\trojan\projects\rubiksolver\main.cpp
+	<iostream>
+	"PatternDatabase.h"
+	"include\Utility.h"
+	"Cubies.h"
+	"cube.h"
+	"RubikSolver.h"
+	"TableGenerator.h"
+
+1480887155 source:f:\trojan\projects\rubiksolver\src\cube.cpp
+	"cube.h"
+
+1480768645 f:\trojan\projects\rubiksolver\include\cube.h
+	<iostream>
+	<string>
+	"face.h"
+	"utility.h"
+	"Cubies.h"
+
+1480768559 f:\trojan\projects\rubiksolver\include\face.h
+	<iostream>
+	"utility.h"
+
+1481334391 f:\trojan\projects\rubiksolver\include\utility.h
+	<bits/stdc++.h>
+	<iostream>
+	<stdio.h>
+
+1481139023 f:\trojan\projects\rubiksolver\include\cubies.h
+	"utility.h"
+	<vector>
+	<memory>
+	<math.h>
+	<algorithm>
+
+1481371215 source:f:\trojan\projects\rubiksolver\src\cubies.cpp
+	"Cubies.h"
+
+1480775919 source:f:\trojan\projects\rubiksolver\src\face.cpp
+	"Face.h"
+
+1480867354 f:\trojan\projects\rubiksolver\include\patterndatabase.h
+	"Utility.h"
+
+1481332868 source:f:\trojan\projects\rubiksolver\src\rubiksolver.cpp
+	"RubikSolver.h"
+
+1481138264 f:\trojan\projects\rubiksolver\include\rubiksolver.h
+	"Cube.h"
+	"Cubies.h"
+	"Utility.h"
+	"Stack.h"
+	<vector>
+	<stack>
+	<math.h>
+	<algorithm>
+	<memory>
+
+1481137513 f:\trojan\projects\rubiksolver\include\tablegenerator.h
+	"Cube.h"
+	"Cubies.h"
+	"Utility.h"
+	"Stack.h"
+	<vector>
+	<stack>
+	<math.h>
+	<algorithm>
+	<memory>
+
+1481409989 source:f:\trojan\projects\rubiksolver\src\tablegenerator.cpp
+	"TableGenerator.h"
+
+1481137842 f:\trojan\projects\rubiksolver\include\stack.h
+	"Cubies.h"
+	<memory>
+
+1480965373 source:f:\trojan\projects\rubiksolver\src\stack.cpp
+	"Stack.h"
+
