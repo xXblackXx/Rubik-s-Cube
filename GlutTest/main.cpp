@@ -28,12 +28,12 @@ enum rotateSpeedEnum { e_NormalSpeed, e_FastSpeed};
 enum sides { e_Front, e_Back, e_Left, e_Right, e_Top, e_Bottom };
 enum cubeColors { e_Red, e_Blue, e_Yellow, e_Green, e_White, e_Orange };
 int rotateStatus ;
-int rotateSpeed = 0;
+int rotateSpeed = 1;
 
 float colorsRGB[6][3] = {
     { 1,0,0 }, { 0,0,1 }, { 1,1,0 }, { 0,1,0 }, { 1,1,1 }, { 1,0.5,0 }
 };
-float rotationSpeeds[2] = { 0.0625, 3 } ;
+float rotationSpeeds[2] = { 1, 3 } ;
 int rotationsCount[2] = { 1, 3 } ;
 
 // angle of rotation for the camera direction
@@ -142,7 +142,7 @@ void constructFaces(std::string s)
     {
         for ( int j = 0 ; j < 3 ; j++ )
             for ( int k = 0 ; k < 3 ; k++ )
-                cubes[j*9+k].sideColor[e_Bottom] = getColorOfChar(s[j*3+k+18]) ;
+                cubes[j*9+k].sideColor[e_Bottom] = getColorOfChar(s[24-j*3+k]) ;
     }
     #endif
     #ifndef back
@@ -495,9 +495,10 @@ void renderScene(void) {
     if ( rotateAngel < 0 ) rotateAngel += 360 ;
     /// @@@@@@@@@@@@@
     cnt++ ;
-    if ( cnt > 10000 )
+    if ( cnt > 100  )
     {
         cnt = 100 ;
+        //k = 1 ; //w7eee4
         if ( !k )
             rotateStatus = sol[idx++] ;
         k = 1 ;
@@ -689,7 +690,7 @@ void printSolution(short* path)
                 break;
         }
         if (*t >= 12) {
-            fprintf(stdout, "2%c ", face);
+            fprintf(stdout, "%c2 ", face);
         } else if (*t >= 6) {
             fprintf(stdout, "%c' ", face);
         } else {
@@ -709,18 +710,23 @@ void InitApp()
 }
 
 
-void Solve(string cube)
+void Solve(string cubeStr)
 {
-    Cube c = Cube(cube);
-	shared_ptr<Cubies> cbs = Cubies::Copy(c.toCubiesFromSides());
+    //Cube c = Cube(cubeStr);
+	//shared_ptr<Cubies> cbs = Cubies::Copy(c.toCubiesFromSides());
 
-    for (int i = 0; i < 20; i++) cout << cbs->positions[i] << " \n"[i == 19];
-    for (int i = 0; i < 20; i++) cout << cbs->orientations[i] << " \n"[i == 19];
+    //for (int i = 0; i < 20; i++) cout << cbs->positions[i] << " \n"[i == 19];
+    //for (int i = 0; i < 20; i++) cout << cbs->orientations[i] << " \n"[i == 19];
+
+    // 16 MOVES
+    //string movs[] = {"B", "F", "U", "B", "U", "B2", "D2", "L", "F2", "R2", "B", "F", "D'", "R'", "B'", "F"};
 
     // 5 MOVES
-    string movs[] = { "D'", "U'", "R", "L'", "D'" };
-    //shared_ptr<Cubies>
-    cbs = Cubies::Copy(Cube::CubeFromMovesList(movs, 5));
+    //string movs[] = { "D'", "U'", "R", "L'", "D'" };
+    // 14 MOVES
+    string movs[] = {"U'", "L'", "R'", "B", "F'", "D'", "U", "L", "R'", "U", "L2", "F2", "L2", "B2" };
+
+    shared_ptr<Cubies> cbs = Cubies::Copy(Cube::CubeFromMovesList(movs, 14));
 
 	cbs->SetPatternTables(CORNER_TABLE, EDGE1_TABLE, EDGE2_TABLE);
 
@@ -742,15 +748,23 @@ void Solve(string cube)
 	delete[] CORNER_TABLE;
 	delete[] EDGE1_TABLE;
 	delete[] EDGE2_TABLE;
+
 }
 
 
 int main(int argc, char **argv) {
     InitApp();
 
-    string cubestr = "brbwrwgrgoboowoygwbygooobygrgrryrybwygwygwrbrybwybwogo";
+    //16 moves
+    //string cubeStr = "wyooyrrgwgoborrywwoboywrbwgyoryowygyogbygggbrbbwrbwrbg";
+    // 14 moves
+    string cubeStr = "goroyrorgwgyrrbrwbboobwrrgbgbogooyywrbwwgwwwoyggybybyy";
+    //5 moves
+    //string cubeStr = "brbwrwgrgoboowoygwbygooobygrgrryrybwygwygwrbrybwybwogo";
+    Solve(cubeStr) ;
+    cout << endl;
 
-    Solve(cubestr);
+    //sol = vector<int>();
 
 	// init GLUT and create window
 	glutInit(&argc, argv);
@@ -770,7 +784,7 @@ int main(int argc, char **argv) {
 	glutSpecialUpFunc(releaseKey);
 
     //std::string cubeString = "brbwrwgrgoboowoygwbygooobygrgrryrybwygwygwrbrybwybwogo";
-    constructFaces(cubestr) ;
+    constructFaces(cubeStr) ;
 
 	// OpenGL init
 	glEnable(GL_DEPTH_TEST);
