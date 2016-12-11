@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1481461947 source:f:\trojan\projects\gluttest\main.cpp
+1481467066 source:f:\trojan\projects\gluttest\main.cpp
 	<stdlib.h>
 	<math.h>
 	<iostream>
@@ -241,7 +241,7 @@
 	<stddef.h>
 	<GL/gl.h>
 
-1480887155 source:f:\trojan\projects\gluttest\cube.cpp
+1481464256 source:f:\trojan\projects\gluttest\cube.cpp
 	"cube.h"
 
 1481461960 f:\trojan\projects\gluttest\cube.h

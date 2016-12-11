@@ -38,6 +38,47 @@ void Cube::strToCube(string s)
 	i += 9;
 }
 
+string Cube::fromCubiesToCubeString(Cubies& cubie)
+{
+    string cube = cubie.toStringOfFaces();
+    string tmp = "";
+    cube = faceLetterToColor(cube);
+
+    // put colors in the correct face
+    // up front down back right left
+
+    // up
+           tmp += cube[39] + cube[12] + cube[36] + cube[10]
+                + center[0]
+                + cube[8] + cube[28] + cube[1] + cube[5];
+
+    // front
+           tmp += cube[27] + cube[0] + cube[24] + cube[6]
+                + center[1]
+                + cube[4] + cube[33] + cube[2] + cube[30];
+
+    // down
+           tmp += cube[34] + cube[3] + cube[31] + cube[16]
+                + center[2]
+                + cube[14] + cube[45] + cube[18] + cube[42];
+
+    // back
+           tmp += cube[37] + cube[13] + cube[40] + cube[20]
+                + center[3]
+                + cube[22] + cube[43] + cube[19] + cube[46];
+
+    // right
+           tmp += cube[26] + cube[9] + cube[38] + cube[5]
+                + center[4]
+                + cube[21] + cube[32] + cube[15] + cube[44];
+
+    // left
+           tmp += cube[41] + cube[11] + cube[29] + cube[23]
+                + center[5]
+                + cube[7] + cube[47] + cube[17] + cube[35];
+   return tmp;
+}
+
 char Cube::colorToFaceLetter(Color c)
 {
 	Color temp[6];
@@ -200,11 +241,11 @@ Cubie Cube::toCubie(string s)
 short Cube::getOrientation(string s)
 {
 	short orientation = 0;
-	for(short i = 0; i < 6; i++)
+	for(int i = 0; i < 6; i++)
 	{
 		if(contains(s, order[i]))
 		{
-			for(short j = 0; j < s.size(); j++)
+			for(int j = 0; j < s.size(); j++)
 			{
 				if(s[j] == order[i])
 					return j;

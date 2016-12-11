@@ -142,7 +142,7 @@ void constructFaces(std::string s)
     {
         for ( int j = 0 ; j < 3 ; j++ )
             for ( int k = 0 ; k < 3 ; k++ )
-                cubes[j*9+k].sideColor[e_Bottom] = getColorOfChar(s[j*3+k+18]) ;
+                cubes[j*9+k].sideColor[e_Bottom] = getColorOfChar(s[24-j*3+k]) ;
     }
     #endif
     #ifndef back
@@ -498,6 +498,7 @@ void renderScene(void) {
     if ( cnt > 10000 )
     {
         cnt = 100 ;
+        //k = 1 ; //w7eee4
         if ( !k )
             rotateStatus = sol[idx++] ;
         k = 1 ;
@@ -689,7 +690,7 @@ void printSolution(short* path)
                 break;
         }
         if (*t >= 12) {
-            fprintf(stdout, "2%c ", face);
+            fprintf(stdout, "%c2 ", face);
         } else if (*t >= 6) {
             fprintf(stdout, "%c' ", face);
         } else {
@@ -709,7 +710,7 @@ void InitApp()
 }
 
 
-void Solve(string cube)
+string Solve()
 {
     Cube c = Cube(cube);
 	shared_ptr<Cubies> cbs = Cubies::Copy(c.toCubiesFromSides());
@@ -717,10 +718,15 @@ void Solve(string cube)
     for (int i = 0; i < 20; i++) cout << cbs->positions[i] << " \n"[i == 19];
     for (int i = 0; i < 20; i++) cout << cbs->orientations[i] << " \n"[i == 19];
 
+    // 16 MOVES
+    string movs[] = {"B", "F", "U", "B", "U", "B2", "D2", "L", "F2", "R2", "B", "F", "D'", "R'", "B'", "F"};
+
     // 5 MOVES
-    string movs[] = { "D'", "U'", "R", "L'", "D'" };
+    //string movs[] = { "D'", "U'", "R", "L'", "D'" };
+    // 14 MOVES
+    //string movs[] = {"U'", "L'", "R'", "B", "F'", "D'", "U", "L", "R'", "U", "L2", "F2", "L2", "B2" };
     //shared_ptr<Cubies>
-    cbs = Cubies::Copy(Cube::CubeFromMovesList(movs, 5));
+    cbs = Cubies::Copy(Cube::CubeFromMovesList(movs, 16));
 
 	cbs->SetPatternTables(CORNER_TABLE, EDGE1_TABLE, EDGE2_TABLE);
 
@@ -742,15 +748,23 @@ void Solve(string cube)
 	delete[] CORNER_TABLE;
 	delete[] EDGE1_TABLE;
 	delete[] EDGE2_TABLE;
+
+    cube c;
+	return c.fromCubiesToCubeString(cbs);
 }
 
 
 int main(int argc, char **argv) {
     InitApp();
 
-    string cubestr = "brbwrwgrgoboowoygwbygooobygrgrryrybwygwygwrbrybwybwogo";
+    //string cubestr = "goroyrorgwgyrrbrwbboobwrrgbgbogooyywrbwwgwwwoyggybybyy";
+    //string cubestr = "wyooyrrgwgoborrywwoboywrbwgyoryowygyogbygggbrbbwrbwrbg";
+    //"brbwrwgrgoboowoygwbygooobygrgrryrybwygwygwrbrybwybwogo";
+    string cubestr = Solve();
 
-    Solve(cubestr);
+    cout << endl;
+    for (int i = 0;i < sol.size(); i++) cout << sol[i] << " \n"[i == sol.size()];
+    //sol = vector<int>();
 
 	// init GLUT and create window
 	glutInit(&argc, argv);

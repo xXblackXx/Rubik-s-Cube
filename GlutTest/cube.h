@@ -17,6 +17,7 @@ class Cube
 
         Cube(string s);
 		void strToCube(string s);
+		string fromCubiesToCubeString(Cubies& cubie);
 
 		bool operator == (const Cube& c);
 		bool operator != (const Cube& c);
