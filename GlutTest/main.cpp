@@ -507,7 +507,10 @@ void renderScene(void) {
         if ( runningAnimation )
         {
             if ( currentStep == sol.size() )
+            {
                 runningAnimation = false ;
+                glutAttachMenu(GLUT_RIGHT_BUTTON);
+            }
             else rotateStatus = sol[currentStep++] ;
         }
     }
@@ -541,10 +544,11 @@ void replay()
 }
 
 void runNewCube() ;
-void startVisulization()
+void startAnimation()
 {
     if ( sol.empty() || runningAnimation || !cubeLoaded ) return ;
     rotateStatus = sol[currentStep++] ;
+    glutDetachMenu(GLUT_RIGHT_BUTTON);
     runningAnimation = true ;
 }
 void ExitApp();
@@ -558,7 +562,7 @@ void pressNormalKey(unsigned char key, int xx, int yy)
         case 'n' : case 'N' :
             runNewCube() ; break;
         case 's' : case 'S' :
-            startVisulization() ; break;
+            startAnimation() ; break;
         case 'e' : case 'E' :
             ExitApp() ; break;
 	}
