@@ -17,6 +17,7 @@ class Cube
 
         Cube(string s);
 		void strToCube(string s);
+		string fromCubiesToCubeString(Cubies& cubie);
 
 		bool operator == (const Cube& c);
 		bool operator != (const Cube& c);
@@ -47,8 +48,8 @@ class Cube
 		static Cubies CubeFromMovesList(string* moveList, int len);
     private:
         Face up, down, front, back, right, left;
-		string order = "FUDBRL";
-		char center[6];
+        string order = "UDFBRL";
+        char center[6];
 };
 
 #endif // CUBE_H
