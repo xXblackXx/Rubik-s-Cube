@@ -27,16 +27,18 @@ enum rotateCountEnum { e_ClockRotationCount, e_CounterRotationCount };
 enum rotateSpeedEnum { e_NormalSpeed, e_FastSpeed};
 enum sides { e_Front, e_Back, e_Left, e_Right, e_Up, e_Down };
 enum cubeColors { e_Red, e_Blue, e_Yellow, e_Green, e_White, e_Orange };
-int rotateStatus ;
+int rotateStatus = 0 ;
 int rotateSpeed = 1;
+bool cubeLoaded = false ;
 
 float colorsRGB[6][3] = {
     { 1,0,0 }, { 0,0,1 }, { 1,1,0 }, { 0,1,0 }, { 1,1,1 }, { 1,0.5,0 }
 };
 float rotationSpeeds[2] = { 1, 3 } ;
 int rotationsCount[2] = { 1, 3 } ;
-time_t timer ;
-bool running ; // for visualization
+time_t timer = 0 ;
+bool runningAnimation = false ; // for visualization
+double rotateAngel = 0 ;
 
 
 void changeSize(int w, int h) {
@@ -63,8 +65,6 @@ void changeSize(int w, int h) {
 	glMatrixMode(GL_MODELVIEW);
 }
 
-double rotateAngel  ;
-double center_dis = 1.1;
 
 /* 0  - > 8 back
  * 9  - > 17 mid
@@ -504,36 +504,21 @@ void renderScene(void) {
         rotateFace() ;
         rotateAngel = 0 ;
         rotateStatus = e_None ;
-        if ( running )
+        if ( runningAnimation )
         {
             if ( currentStep == sol.size() )
-                running = false ;
+                runningAnimation = false ;
             else rotateStatus = sol[currentStep++] ;
         }
     }
 	glLoadIdentity();
 	// Set the camera
-	/*
-	gluLookAt(	x, 5.0f, 10,
-				x+lx, 0.0f,  z+lz,
-				0.0f, 1.0f,  0.0f);
-    */
+
     gluLookAt(	10.0f, 10.0f, 10.0f,
 				0.38194f, 0.0f,  0.951643f,
 				0.0f, 1.0f,  0.0f);
 
     //0.38194 0.951643
-
-// Draw ground
-    /*
-	glColor3f(0.9f, 0.9f, 0.9f);
-	glBegin(GL_QUADS);
-		glVertex3f(-100.0f, 0.0f, -100.0f);
-		glVertex3f(-100.0f, 0.0f,  100.0f);
-		glVertex3f( 100.0f, 0.0f,  100.0f);
-		glVertex3f( 100.0f, 0.0f, -100.0f);
-	glEnd();
-	*/
 
     glPushMatrix();
     glTranslatef(0.0,0,0.0);
@@ -549,7 +534,7 @@ void renderScene(void) {
 string cubeStr ;
 void replay()
 {
-    if ( running ) return ;
+    if ( runningAnimation || !cubeLoaded ) return ;
     currentStep = 0 ;
     timer = time(0) ;
     constructFaces(cubeStr) ;
@@ -558,14 +543,14 @@ void replay()
 void runNewCube() ;
 void startVisulization()
 {
-    if ( sol.empty() || running ) return ;
+    if ( sol.empty() || runningAnimation || !cubeLoaded ) return ;
     rotateStatus = sol[currentStep++] ;
-    running = true ;
+    runningAnimation = true ;
 }
 void ExitApp();
 void pressNormalKey(unsigned char key, int xx, int yy)
 {
-    if ( running ) return ;
+    if ( runningAnimation ) return ;
 
     switch (key) {
 		case 'r' : case 'R' :
@@ -763,14 +748,6 @@ void Solve(string cubeStr)
 	cbs->SetPatternTables(CORNER_TABLE, EDGE1_TABLE, EDGE2_TABLE);
 
 
-	for (int i = 0; i < 20; i++) cout << cbs->positions[i] << " \n"[i == 19];
-    for (int i = 0; i < 20; i++) cout << cbs->orientations[i] << " \n"[i == 19];
-
-    cout << cbs->GetCornerHash() << endl;
-	cout << cbs->GetEdge1Hash() << endl;
-	cout << cbs->GetEdge2Hash() << endl;
-	cout << (int)cbs->Heuristic() << endl;
-
 	RubikSolver solver(cbs);
 
 	solver.Solve();
@@ -782,7 +759,8 @@ void Solve(string cubeStr)
 
 void runNewCube()
 {
-    if ( running ) return ;
+    if ( runningAnimation ) return ;
+    if ( !cubeLoaded ) cubeLoaded = true ;
     sol.clear() ;
     currentStep = 0 ;
     cubeStr = readCubeFromFile() ;
@@ -792,7 +770,7 @@ void runNewCube()
 }
 int main(int argc, char **argv) {
     InitApp();
-    runNewCube();
+   // runNewCube();
     //16 moves
     //string cubeStr = "wyooyrrgwgoborrywwoboywrbwgyoryowygyogbygggbrbbwrbwrbg";
     // 14 moves
