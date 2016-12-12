@@ -36,6 +36,44 @@ Cubies::Cubies()
 // 	D
 // };
 
+
+string Cubies::cornerWithOrientation(string c, short orient)
+{
+    string res = "";
+    if(orient == 1)
+    {
+        res += (c[2] + c[0] + c[1]);
+    }
+    else
+    {
+        res += (c[1] + c[2] + c[0]);
+    }
+    return res;
+}
+/*
+string Cubies::toStringOfFaces()
+{
+    string cube = "";
+    string tmp;
+    for(int i = 0; i < 12; i++)
+    {
+        tmp = fromEdgeToString(positions[i]);
+        if(orientations[i] == 1)
+            swap(tmp[0], tmp[1]);
+        cube += tmp;
+    }
+
+    for(int i = 12; i < 20; i++)
+    {
+        tmp = fromCornerToString(positions[i]);
+        if(orientations != 0)
+            tmp = this->cornerWithOrientation(tmp, orientations[i]);
+        cube += tmp;
+    }
+    return cube;
+}
+*/
+
 void Cubies::clockCycle(moves m)
 {
 

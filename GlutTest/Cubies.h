@@ -21,6 +21,15 @@ class Cubies
 		short positions[20];
 		short orientations[20];
 
+
+            // functions to transform Cubies to Cube class
+
+            // orientation to fix the cubie name
+            // for edge normal swap would be sufficient
+            // for corner rotate right or left
+            string cornerWithOrientation(string c, short orient);
+            string toStringOfFaces();
+
 		bool operator==(Cubies& cbs);
 		short lastOp;
 		//vector<short> Solution;

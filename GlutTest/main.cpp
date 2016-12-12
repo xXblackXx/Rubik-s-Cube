@@ -19,13 +19,13 @@
 
 #define ATV(array) array[0], array[1], array[2] /* Arr to val */
 
-enum facesEnum { e_None, e_ClockTop, e_ClockFront, e_ClockBottom, e_ClockBack, e_ClockRight, e_ClockLeft,
-                 e_CounterTop, e_CounterFront, e_CounterBottom, e_CounterBack, e_CounterRight, e_CounterLeft };
-enum rotateVectorEnum { e_LeftClockRightCounter, e_LeftCounterRightClock, e_TopCounterBottomClock,
-                        e_TopClockBottomCounter, e_FrontClockBackCounter, e_FrontCounterBackClock };
+enum facesEnum { e_None, e_ClockUp, e_ClockFront, e_ClockDown, e_ClockBack, e_ClockRight, e_ClockLeft,
+                 e_CounterUp, e_CounterFront, e_CounterDown, e_CounterBack, e_CounterRight, e_CounterLeft };
+enum rotateVectorEnum { e_LeftClockRightCounter, e_LeftCounterRightClock, e_UpCounterDownClock,
+                        e_UpClockDownCounter, e_FrontClockBackCounter, e_FrontCounterBackClock };
 enum rotateCountEnum { e_ClockRotationCount, e_CounterRotationCount };
 enum rotateSpeedEnum { e_NormalSpeed, e_FastSpeed};
-enum sides { e_Front, e_Back, e_Left, e_Right, e_Top, e_Bottom };
+enum sides { e_Front, e_Back, e_Left, e_Right, e_Up, e_Down };
 enum cubeColors { e_Red, e_Blue, e_Yellow, e_Green, e_White, e_Orange };
 int rotateStatus ;
 int rotateSpeed = 1;
@@ -35,17 +35,9 @@ float colorsRGB[6][3] = {
 };
 float rotationSpeeds[2] = { 1, 3 } ;
 int rotationsCount[2] = { 1, 3 } ;
+time_t timer ;
+bool running ; // for visualization
 
-// angle of rotation for the camera direction
-float angle = 0.0f;
-// actual vector representing the camera's direction
-float lx=0.0f,lz=-1.0f;
-// XZ position of the camera
-float x=0.0f, z=0.0f;
-// the key states. These variables will be zero
-//when no key is being presses
-float deltaAngle = 0.0f;
-float deltaMove = 0;
 
 void changeSize(int w, int h) {
 
@@ -79,8 +71,8 @@ double center_dis = 1.1;
  * 18 - > 26 front
  * i%3 == 0 , i - > left
  * i%3 == 2 , i - > right
- * i%9 < 3  , i - > bottom
- * i%9 > 5  , i - > top
+ * i%9 < 3  , i - > Down
+ * i%9 > 5  , i - > Up
 */
 float positions[27][3] = {
     /* first slide */
@@ -124,11 +116,11 @@ int getColorOfChar( char c )
 }
 void constructFaces(std::string s)
 {
-    #ifndef top
+    #ifndef Up
     {
         for ( int j = 0 ; j < 3 ; j++ )
             for ( int k = 0 ; k < 3 ; k++ )
-                cubes[6+j*9+k].sideColor[e_Top] = getColorOfChar(s[j*3+k]) ;
+                cubes[6+j*9+k].sideColor[e_Up] = getColorOfChar(s[j*3+k]) ;
     }
     #endif
     #ifndef front
@@ -138,11 +130,11 @@ void constructFaces(std::string s)
                 cubes[24-j*3+k].sideColor[e_Front] = getColorOfChar(s[j*3+k+9]) ;
     }
     #endif
-    #ifndef bottom
+    #ifndef Down
     {
         for ( int j = 0 ; j < 3 ; j++ )
             for ( int k = 0 ; k < 3 ; k++ )
-                cubes[j*9+k].sideColor[e_Bottom] = getColorOfChar(s[24-j*3+k]) ;
+                cubes[j*9+k].sideColor[e_Down] = getColorOfChar(s[24-j*3+k]) ;
     }
     #endif
     #ifndef back
@@ -177,25 +169,25 @@ float rotateVector[6][3] = {
 /*
     left - right
     glRotated(cnt,1,0,0);
-    top - bottom
+    Up - Down
     glRotated(cnt,0,1,0);
     front - back
     glRotated(cnt,0,0,1);
 */
-int faceTopEquation(int i, int j)
+int faceUpEquation(int i, int j)
 {
     return i*9+j+6 ;
 }
-bool isFaceTop(int i)
+bool isFaceUp(int i)
 {
     return i%9 > 5  ;
 }
-int faceBottomEquation(int i, int j)
+int faceDownEquation(int i, int j)
 {
     return i+j*9;
 }
 
-bool isFaceBottom(int i)
+bool isFaceDown(int i)
 {
     return i%9 < 3 ;
 }
@@ -249,12 +241,12 @@ int getFaceIndex(int i, int j)
         case e_ClockLeft:
         case e_CounterLeft:
             return faceLeftEquation(i,j) ;
-        case e_ClockTop:
-        case e_CounterTop:
-            return faceTopEquation(i,j) ;
-        case e_ClockBottom:
-        case e_CounterBottom:
-            return faceBottomEquation(i,j) ;
+        case e_ClockUp:
+        case e_CounterUp:
+            return faceUpEquation(i,j) ;
+        case e_ClockDown:
+        case e_CounterDown:
+            return faceDownEquation(i,j) ;
     }
     assert(false);
 }
@@ -273,12 +265,12 @@ bool isRotatedIndex(int i)
         case e_ClockLeft:
         case e_CounterLeft:
             return isFaceLeft(i) ;
-        case e_ClockTop:
-        case e_CounterTop:
-            return isFaceTop(i) ;
-        case e_ClockBottom:
-        case e_CounterBottom:
-            return isFaceBottom(i) ;
+        case e_ClockUp:
+        case e_CounterUp:
+            return isFaceUp(i) ;
+        case e_ClockDown:
+        case e_CounterDown:
+            return isFaceDown(i) ;
     }
     return false ;
 }
@@ -297,12 +289,12 @@ int getRotateVector()
         case e_CounterRight:
         case e_ClockLeft:
             return e_LeftClockRightCounter ;
-        case e_ClockTop:
-        case e_CounterBottom:
-            return e_TopClockBottomCounter ;
-        case e_CounterTop:
-        case e_ClockBottom:
-            return e_TopCounterBottomClock ;
+        case e_ClockUp:
+        case e_CounterDown:
+            return e_UpClockDownCounter ;
+        case e_CounterUp:
+        case e_ClockDown:
+            return e_UpCounterDownClock ;
     }
     assert(false) ;
 }
@@ -313,15 +305,15 @@ int getRotationCount()
         case e_ClockFront:
         case e_ClockRight:
         case e_ClockLeft:
-        case e_ClockTop:
-        case e_ClockBottom:
+        case e_ClockUp:
+        case e_ClockDown:
             return rotationsCount[e_ClockRotationCount] ;
         case e_CounterBack:
         case e_CounterFront:
         case e_CounterRight:
         case e_CounterLeft:
-        case e_CounterTop:
-        case e_CounterBottom:
+        case e_CounterUp:
+        case e_CounterDown:
             return rotationsCount[e_CounterRotationCount] ;
     }
     assert(false) ;
@@ -352,62 +344,62 @@ void rotateFace()
                 if ( rotateStatus == e_ClockLeft
                     || rotateStatus == e_CounterLeft  )
                 {
-                    newCubes[i][j].sideColor[e_Top] = tmpCubes[3-j-1][i].sideColor[e_Back];
-                    newCubes[i][j].sideColor[e_Back] = tmpCubes[3-j-1][i].sideColor[e_Bottom];
-                    newCubes[i][j].sideColor[e_Bottom] = tmpCubes[3-j-1][i].sideColor[e_Front];
-                    newCubes[i][j].sideColor[e_Front] = tmpCubes[3-j-1][i].sideColor[e_Top];
+                    newCubes[i][j].sideColor[e_Up] = tmpCubes[3-j-1][i].sideColor[e_Back];
+                    newCubes[i][j].sideColor[e_Back] = tmpCubes[3-j-1][i].sideColor[e_Down];
+                    newCubes[i][j].sideColor[e_Down] = tmpCubes[3-j-1][i].sideColor[e_Front];
+                    newCubes[i][j].sideColor[e_Front] = tmpCubes[3-j-1][i].sideColor[e_Up];
                     newCubes[i][j].sideColor[e_Left] = tmpCubes[3-j-1][i].sideColor[e_Left];
                     newCubes[i][j].sideColor[e_Right] = tmpCubes[3-j-1][i].sideColor[e_Right];
                 }
                 else if ( rotateStatus == e_ClockRight
                     || rotateStatus == e_CounterRight )
                 {
-                    newCubes[i][j].sideColor[e_Top] = tmpCubes[3-j-1][i].sideColor[e_Front];
-                    newCubes[i][j].sideColor[e_Front] = tmpCubes[3-j-1][i].sideColor[e_Bottom];
-                    newCubes[i][j].sideColor[e_Bottom] = tmpCubes[3-j-1][i].sideColor[e_Back];
-                    newCubes[i][j].sideColor[e_Back] = tmpCubes[3-j-1][i].sideColor[e_Top];
+                    newCubes[i][j].sideColor[e_Up] = tmpCubes[3-j-1][i].sideColor[e_Front];
+                    newCubes[i][j].sideColor[e_Front] = tmpCubes[3-j-1][i].sideColor[e_Down];
+                    newCubes[i][j].sideColor[e_Down] = tmpCubes[3-j-1][i].sideColor[e_Back];
+                    newCubes[i][j].sideColor[e_Back] = tmpCubes[3-j-1][i].sideColor[e_Up];
                     newCubes[i][j].sideColor[e_Left] = tmpCubes[3-j-1][i].sideColor[e_Left];
                     newCubes[i][j].sideColor[e_Right] = tmpCubes[3-j-1][i].sideColor[e_Right];
                 }
                 else if ( rotateStatus == e_ClockFront
                     || rotateStatus == e_CounterFront )
                 {
-                    newCubes[i][j].sideColor[e_Top] = tmpCubes[3-j-1][i].sideColor[e_Left];
-                    newCubes[i][j].sideColor[e_Left] = tmpCubes[3-j-1][i].sideColor[e_Bottom];
-                    newCubes[i][j].sideColor[e_Bottom] = tmpCubes[3-j-1][i].sideColor[e_Right];
-                    newCubes[i][j].sideColor[e_Right] = tmpCubes[3-j-1][i].sideColor[e_Top];
+                    newCubes[i][j].sideColor[e_Up] = tmpCubes[3-j-1][i].sideColor[e_Left];
+                    newCubes[i][j].sideColor[e_Left] = tmpCubes[3-j-1][i].sideColor[e_Down];
+                    newCubes[i][j].sideColor[e_Down] = tmpCubes[3-j-1][i].sideColor[e_Right];
+                    newCubes[i][j].sideColor[e_Right] = tmpCubes[3-j-1][i].sideColor[e_Up];
                     newCubes[i][j].sideColor[e_Front] = tmpCubes[3-j-1][i].sideColor[e_Front];
                     newCubes[i][j].sideColor[e_Back] = tmpCubes[3-j-1][i].sideColor[e_Back];
                 }
                 else if ( rotateStatus == e_ClockBack
                     || rotateStatus == e_CounterBack )
                 {
-                    newCubes[i][j].sideColor[e_Top] = tmpCubes[3-j-1][i].sideColor[e_Right];
-                    newCubes[i][j].sideColor[e_Right] = tmpCubes[3-j-1][i].sideColor[e_Bottom];
-                    newCubes[i][j].sideColor[e_Bottom] = tmpCubes[3-j-1][i].sideColor[e_Left];
-                    newCubes[i][j].sideColor[e_Left] = tmpCubes[3-j-1][i].sideColor[e_Top];
+                    newCubes[i][j].sideColor[e_Up] = tmpCubes[3-j-1][i].sideColor[e_Right];
+                    newCubes[i][j].sideColor[e_Right] = tmpCubes[3-j-1][i].sideColor[e_Down];
+                    newCubes[i][j].sideColor[e_Down] = tmpCubes[3-j-1][i].sideColor[e_Left];
+                    newCubes[i][j].sideColor[e_Left] = tmpCubes[3-j-1][i].sideColor[e_Up];
                     newCubes[i][j].sideColor[e_Front] = tmpCubes[3-j-1][i].sideColor[e_Front];
                     newCubes[i][j].sideColor[e_Back] = tmpCubes[3-j-1][i].sideColor[e_Back];
                 }
-                else if ( rotateStatus == e_ClockTop
-                    || rotateStatus == e_CounterTop )
+                else if ( rotateStatus == e_ClockUp
+                    || rotateStatus == e_CounterUp )
                 {
                     newCubes[i][j].sideColor[e_Back] = tmpCubes[3-j-1][i].sideColor[e_Left];
                     newCubes[i][j].sideColor[e_Left] = tmpCubes[3-j-1][i].sideColor[e_Front];
                     newCubes[i][j].sideColor[e_Front] = tmpCubes[3-j-1][i].sideColor[e_Right];
                     newCubes[i][j].sideColor[e_Right] = tmpCubes[3-j-1][i].sideColor[e_Back];
-                    newCubes[i][j].sideColor[e_Top] = tmpCubes[3-j-1][i].sideColor[e_Top];
-                    newCubes[i][j].sideColor[e_Bottom] = tmpCubes[3-j-1][i].sideColor[e_Bottom];
+                    newCubes[i][j].sideColor[e_Up] = tmpCubes[3-j-1][i].sideColor[e_Up];
+                    newCubes[i][j].sideColor[e_Down] = tmpCubes[3-j-1][i].sideColor[e_Down];
                 }
-                else if ( rotateStatus == e_ClockBottom
-                    || rotateStatus == e_CounterBottom )
+                else if ( rotateStatus == e_ClockDown
+                    || rotateStatus == e_CounterDown )
                 {
                     newCubes[i][j].sideColor[e_Back] = tmpCubes[3-j-1][i].sideColor[e_Right];
                     newCubes[i][j].sideColor[e_Right] = tmpCubes[3-j-1][i].sideColor[e_Front];
                     newCubes[i][j].sideColor[e_Front] = tmpCubes[3-j-1][i].sideColor[e_Left];
                     newCubes[i][j].sideColor[e_Left] = tmpCubes[3-j-1][i].sideColor[e_Back];
-                    newCubes[i][j].sideColor[e_Top] = tmpCubes[3-j-1][i].sideColor[e_Top];
-                    newCubes[i][j].sideColor[e_Bottom] = tmpCubes[3-j-1][i].sideColor[e_Bottom];
+                    newCubes[i][j].sideColor[e_Up] = tmpCubes[3-j-1][i].sideColor[e_Up];
+                    newCubes[i][j].sideColor[e_Down] = tmpCubes[3-j-1][i].sideColor[e_Down];
                 }
             }
 
@@ -451,15 +443,15 @@ void drawCube() {
         }
         glTranslatef(ATV(positions[i]));
         glutSolidCube  (1.0);
-        if ( isFaceTop(i) )
+        if ( isFaceUp(i) )
         {
-            glColor3f(ATV(colorsRGB[cubes[i].sideColor[e_Top]])) ;
-            drawSquare(e_Top) ;
+            glColor3f(ATV(colorsRGB[cubes[i].sideColor[e_Up]])) ;
+            drawSquare(e_Up) ;
         }
-        if ( isFaceBottom(i) )
+        if ( isFaceDown(i) )
         {
-            glColor3f(ATV(colorsRGB[cubes[i].sideColor[e_Bottom]])) ;
-            drawSquare(e_Bottom) ;
+            glColor3f(ATV(colorsRGB[cubes[i].sideColor[e_Down]])) ;
+            drawSquare(e_Down) ;
         }
         if ( isFaceFront(i) )
         {
@@ -483,64 +475,41 @@ void drawCube() {
         }
         glPopMatrix();
     }
-    if ( rotateStatus )
+    if ( rotateStatus && difftime(timer,time(0)) >= 100 )
+    {
         rotateAngel += getRotationSpeed() ;
+        timer = time(0) ;
+    }
 
 }
 
-void computePos(float deltaMove) {
 
-	x += deltaMove * lx * 0.1f;
-	z += deltaMove * lz * 0.1f;
-}
 
-void computeDir(float deltaAngle) {
+int currentStep = 0 ; // in solution steps
+vector<int> sol; // solution step
 
-	angle += deltaAngle;
-	lx = sin(angle);
-	lz = -cos(angle);
-}
-
-/// @@@@ yaaaaaa3
-int idx = 0 ;
-int n = 5 ;
-vector<int> sol;
-//int sol[5] = {e_ClockBottom,e_ClockLeft,e_CounterRight,e_ClockTop,e_ClockBottom} ;
-int cnt = 0 ;
-bool k = 0 ;
-
-/// @@@@@@@
+void Solve(string tmp ) ;
+void InitApp();
 
 void renderScene(void) {
 
-	if (deltaMove)
-		computePos(deltaMove);
-	if (deltaAngle)
-		computeDir(deltaAngle);
 
 	// Clear Color and Depth Buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Reset transformations
     if ( rotateAngel < 0 ) rotateAngel += 360 ;
-    /// @@@@@@@@@@@@@
-    cnt++ ;
-    if ( cnt > 100  )
-    {
-        cnt = 100 ;
-        //k = 1 ; //w7eee4
-        if ( !k )
-            rotateStatus = sol[idx++] ;
-        k = 1 ;
-    }
-    /// @@@@@@@@@@@@@@
     if ( rotateAngel == 90 + getRotationSpeed() || rotateAngel == 270-getRotationSpeed() )
     {
         rotateFace() ;
         rotateAngel = 0 ;
         rotateStatus = e_None ;
-        if ( idx == sol.size() ) ;
-        else rotateStatus = sol[idx++] ;
+        if ( running )
+        {
+            if ( currentStep == sol.size() )
+                running = false ;
+            else rotateStatus = sol[currentStep++] ;
+        }
     }
 	glLoadIdentity();
 	// Set the camera
@@ -549,8 +518,8 @@ void renderScene(void) {
 				x+lx, 0.0f,  z+lz,
 				0.0f, 1.0f,  0.0f);
     */
-    gluLookAt(	x, 10.0f, z,
-				0.38194, x,  0.951643,
+    gluLookAt(	10.0f, 10.0f, 10.0f,
+				0.38194f, 0.0f,  0.951643f,
 				0.0f, 1.0f,  0.0f);
 
     //0.38194 0.951643
@@ -576,25 +545,40 @@ void renderScene(void) {
 }
 
 
-void pressKey(int key, int xx, int yy) {
 
-	switch (key) {
-		case GLUT_KEY_LEFT : deltaAngle = -0.01f; break;
-		case GLUT_KEY_RIGHT : deltaAngle = 0.01f; break;
-		case GLUT_KEY_UP : deltaMove = 0.5f; break;
-		case GLUT_KEY_DOWN : deltaMove = -0.5f; break;
+string cubeStr ;
+void replay()
+{
+    if ( running ) return ;
+    currentStep = 0 ;
+    timer = time(0) ;
+    constructFaces(cubeStr) ;
+}
+
+void runNewCube() ;
+void startVisulization()
+{
+    if ( sol.empty() || running ) return ;
+    rotateStatus = sol[currentStep++] ;
+    running = true ;
+}
+void ExitApp();
+void pressNormalKey(unsigned char key, int xx, int yy)
+{
+    if ( running ) return ;
+
+    switch (key) {
+		case 'r' : case 'R' :
+            replay() ; break;
+        case 'n' : case 'N' :
+            runNewCube() ; break;
+        case 's' : case 'S' :
+            startVisulization() ; break;
+        case 'e' : case 'E' :
+            ExitApp() ; break;
 	}
 }
 
-void releaseKey(int key, int x, int y) {
-
-	switch (key) {
-		case GLUT_KEY_LEFT :
-		case GLUT_KEY_RIGHT : deltaAngle = 0.0f;break;
-		case GLUT_KEY_UP :
-		case GLUT_KEY_DOWN : deltaMove = 0;break;
-	}
-}
 
 void processRotateMenuEvents(int option)
 {
@@ -612,15 +596,15 @@ void createGLUTMenus()
     int clockWiseMenu = glutCreateMenu(processRotateMenuEvents) ;
     glutAddMenuEntry("Left",e_ClockLeft) ;
     glutAddMenuEntry("Right",e_ClockRight) ;
-    glutAddMenuEntry("Top",e_ClockTop) ;
-    glutAddMenuEntry("Bottom",e_ClockBottom) ;
+    glutAddMenuEntry("Up",e_ClockUp) ;
+    glutAddMenuEntry("Down",e_ClockDown) ;
     glutAddMenuEntry("Front",e_ClockFront) ;
     glutAddMenuEntry("Back",e_ClockBack) ;
     int counterClockWiseMenu = glutCreateMenu(processRotateMenuEvents) ;
     glutAddMenuEntry("Left",e_CounterLeft) ;
     glutAddMenuEntry("Right",e_CounterRight) ;
-    glutAddMenuEntry("Top",e_CounterTop) ;
-    glutAddMenuEntry("Bottom",e_CounterBottom) ;
+    glutAddMenuEntry("Up",e_CounterUp) ;
+    glutAddMenuEntry("Down",e_CounterDown) ;
     glutAddMenuEntry("Front",e_CounterFront) ;
     glutAddMenuEntry("Back",e_CounterBack) ;
     int mainMenu = glutCreateMenu(processMainMenuEvents) ;
@@ -639,16 +623,16 @@ void printSolution(short* path)
     while (*t != -1) {
         switch (*t) {
             case 0:
-                sol.push_back(e_ClockTop);
+                sol.push_back(e_ClockUp);
                 face = 'U';
                 break;
             case 6:
-                sol.push_back(e_CounterTop);
+                sol.push_back(e_CounterUp);
                 face = 'U';
                 break;
             case 12:
-                sol.push_back(e_ClockTop);
-                sol.push_back(e_ClockTop);
+                sol.push_back(e_ClockUp);
+                sol.push_back(e_ClockUp);
                 face = 'U';
                 break;
             case 1:
@@ -665,16 +649,16 @@ void printSolution(short* path)
                 face = 'F';
                 break;
             case 2:
-                sol.push_back(e_ClockBottom);
+                sol.push_back(e_ClockDown);
                 face = 'D';
                 break;
             case 8:
-                sol.push_back(e_CounterBottom);
+                sol.push_back(e_CounterDown);
                 face = 'D';
                 break;
             case 14:
-                sol.push_back(e_ClockBottom);
-                sol.push_back(e_ClockBottom);
+                sol.push_back(e_ClockDown);
+                sol.push_back(e_ClockDown);
                 face = 'D';
                 break;
             case 3:
@@ -736,10 +720,30 @@ void InitApp()
     InitPatternTables(CORNER_TABLE, EDGE1_TABLE, EDGE2_TABLE);
     LoadPatternTables(CORNER_TABLE, EDGE1_TABLE, EDGE2_TABLE);
 }
-
+void ExitApp()
+{
+    delete[] CORNER_TABLE;
+	delete[] EDGE1_TABLE;
+	delete[] EDGE2_TABLE;
+    exit(0) ;
+}
+string readCubeFromFile()
+{
+    FILE *input ;
+    int stringSize = 54;
+    char cubeChar[stringSize] ;
+    if ( input = fopen("cube.txt", "r") )
+    {
+        fread(cubeChar,1,stringSize,input) ;
+        fclose(input) ;
+        return string(cubeChar) ;
+    }
+    return "goroyrorgwgyrrbrwbboobwrrgbgbogooyywrbwwgwwwoyggybybyy" ;
+}
 
 void Solve(string cubeStr)
 {
+
     Cube c = Cube(cubeStr);
 	shared_ptr<Cubies> cbs = Cubies::Copy(c.toCubiesFromSides());
 
@@ -773,46 +777,45 @@ void Solve(string cubeStr)
 
 	printSolution(solver.actionLog);
 
-	delete[] CORNER_TABLE;
-	delete[] EDGE1_TABLE;
-	delete[] EDGE2_TABLE;
 
 }
 
-
+void runNewCube()
+{
+    if ( running ) return ;
+    sol.clear() ;
+    currentStep = 0 ;
+    cubeStr = readCubeFromFile() ;
+    constructFaces(cubeStr) ;
+    Solve(cubeStr) ;
+    timer = time(0) ;
+}
 int main(int argc, char **argv) {
     InitApp();
-
+    runNewCube();
     //16 moves
     //string cubeStr = "wyooyrrgwgoborrywwoboywrbwgyoryowygyogbygggbrbbwrbwrbg";
     // 14 moves
-    string cubeStr = "goroyrorgwgyrrbrwbboobwrrgbgbogooyywrbwwgwwwoyggybybyy";
+    //string cubeStr = "goroyrorgwgyrrbrwbboobwrrgbgbogooyywrbwwgwwwoyggybybyy";
     //5 moves
     //string cubeStr = "brbwrwgrgoboowoygwbygooobygrgrryrybwygwygwrbrybwybwogo";
-    Solve(cubeStr) ;
-    cout << endl;
 
-    //sol = vector<int>();
 
 	// init GLUT and create window
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100,100);
-	glutInitWindowSize(360,360);
+	glutInitWindowSize(400,400);
 	glutCreateWindow("Rubic Cube");
 
 	// register callbacks
 	glutDisplayFunc(renderScene);
 	glutReshapeFunc(changeSize);
 	glutIdleFunc(renderScene);
-
-	glutSpecialFunc(pressKey);
+    glutKeyboardFunc(pressNormalKey) ;
 
 	glutIgnoreKeyRepeat(1);
-	glutSpecialUpFunc(releaseKey);
 
-    //std::string cubeString = "brbwrwgrgoboowoygwbygooobygrgrryrybwygwygwrbrybwybwogo";
-    constructFaces(cubeStr) ;
 
 	// OpenGL init
 	glEnable(GL_DEPTH_TEST);
@@ -823,8 +826,5 @@ int main(int argc, char **argv) {
 	// enter GLUT event processing cycle
 	glutMainLoop();
 
-    //delete[] CORNER_TABLE;
-	//delete[] EDGE1_TABLE;
-	//delete[] EDGE2_TABLE;
 	return 1;
 }
