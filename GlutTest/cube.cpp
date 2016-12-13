@@ -37,6 +37,47 @@ void Cube::strToCube(string s)
 	left.setSide(FaceName::left);
 	i += 9;
 }
+/*
+string Cube::fromCubiesToCubeString(Cubies& cubie)
+{
+    string cube = cubie.toStringOfFaces();
+    string tmp = "";
+    cube = faceLetterToColor(cube);
+
+    // put colors in the correct face
+    // up front down back right left
+
+    // up
+           tmp += cube[39] + cube[12] + cube[36] + cube[10]
+                + center[0]
+                + cube[8] + cube[28] + cube[1] + cube[5];
+
+    // front
+           tmp += cube[27] + cube[0] + cube[24] + cube[6]
+                + center[1]
+                + cube[4] + cube[33] + cube[2] + cube[30];
+
+    // down
+           tmp += cube[34] + cube[3] + cube[31] + cube[16]
+                + center[2]
+                + cube[14] + cube[45] + cube[18] + cube[42];
+
+    // back
+           tmp += cube[37] + cube[13] + cube[40] + cube[20]
+                + center[3]
+                + cube[22] + cube[43] + cube[19] + cube[46];
+
+    // right
+           tmp += cube[26] + cube[9] + cube[38] + cube[5]
+                + center[4]
+                + cube[21] + cube[32] + cube[15] + cube[44];
+
+    // left
+           tmp += cube[41] + cube[11] + cube[29] + cube[23]
+                + center[5]
+                + cube[7] + cube[47] + cube[17] + cube[35];
+   return tmp;
+}*/
 
 char Cube::colorToFaceLetter(Color c)
 {
@@ -200,11 +241,11 @@ Cubie Cube::toCubie(string s)
 short Cube::getOrientation(string s)
 {
 	short orientation = 0;
-	for(short i = 0; i < 6; i++)
+	for(int i = 0; i < 6; i++)
 	{
 		if(contains(s, order[i]))
 		{
-			for(short j = 0; j < s.size(); j++)
+			for(int j = 0; j < s.size(); j++)
 			{
 				if(s[j] == order[i])
 					return j;
@@ -220,52 +261,58 @@ Cubies Cube::toCubiesFromSides()
 	string cubies[20];
 
 	// edges
-	//FU
-	cubies[0] = fromColorToEdge(front[1], up[7]);
-	//FD
-	cubies[1] = fromColorToEdge(front[7], down[1]);
-	//FR
-	cubies[2] = fromColorToEdge(front[5], right[3]);
-	//FL
-	cubies[3] = fromColorToEdge(front[3], left[5]);
-	//UR
-	cubies[4] = fromColorToEdge(up[5], right[1]);
-	//UL
-	cubies[5] = fromColorToEdge(up[3], left[1]);
-	//UB
-	cubies[6] = fromColorToEdge(up[1], back[1]);
-	//DR
-	cubies[7] = fromColorToEdge(down[5], right[7]);
-	//DL
-	cubies[8] = fromColorToEdge(down[3], left[7]);
-	//DB
-	cubies[9] = fromColorToEdge(down[7], back[7]);
-	//BR
-	cubies[10] = fromColorToEdge(back[3], right[5]);
-	//BL
-	cubies[11] = fromColorToEdge(back[5], left[3]);
+//FU
+    // for orientation purpose string generated as UF
+    cubies[0] = fromColorToEdge(up[7] ,front[1]);
+    //FD
+    // for orientation purpose string generated as DF
+    cubies[1] = fromColorToEdge(down[1], front[7]);
+    //FR
+    cubies[2] = fromColorToEdge(front[5], right[3]);
+    //FL
+    cubies[3] = fromColorToEdge(front[3], left[5]);
+    //UR
+    cubies[4] = fromColorToEdge(up[5], right[1]);
+    //UL
+    cubies[5] = fromColorToEdge(up[3], left[1]);
+    //UB
+    cubies[6] = fromColorToEdge(up[1], back[1]);
+    //DR
+    cubies[7] = fromColorToEdge(down[5], right[7]);
+    //DL
+    cubies[8] = fromColorToEdge(down[3], left[7]);
+    //DB
+    cubies[9] = fromColorToEdge(down[7], back[7]);
+    //BR
+    cubies[10] = fromColorToEdge(back[3], right[5]);
+    //BL
+    cubies[11] = fromColorToEdge(back[5], left[3]);
 
-	// corners
-	//FUR
-	cubies[12] = fromColorToCorner(front[2], up[8], right[0]);
-	//FUL
-	cubies[13] = fromColorToCorner(front[0], up[6], left[2]);
-	//FDR
-	cubies[14] = fromColorToCorner(front[8], down[2], right[6]);
-	//FDL
-	cubies[15] = fromColorToCorner(front[6], down[0], left[8]);
-	//UBRz
-	cubies[16] = fromColorToCorner(up[2], back[0], right[2]);
-	//UBl
-	cubies[17] = fromColorToCorner(up[0], back[2], left[0]);
-	//DBR
-	cubies[18] = fromColorToCorner(down[8], back[6], right[8]);
-	//DBL
-	cubies[19] = fromColorToCorner(down[6], back[8], left[6]);
-
+    // corners
+        //FUR
+    // for orientation purpose string generated as UFR
+    cubies[12] = fromColorToCorner(up[8], front[2], right[0]);
+    //FUL
+    // for orientation purpose string generated as ULF
+    cubies[13] = fromColorToCorner(up[6], left[2], front[0]);
+    //FDR
+    // for orientation purpose string generated as DRF
+    cubies[14] = fromColorToCorner(down[2], right[6], front[8]);
+    //FDL
+    // for orientation purpose string generated as DFL
+    cubies[15] = fromColorToCorner(down[0], front[6], left[8]);
+    //UBR
+    // for orientation purpose string generated as URB
+    cubies[16] = fromColorToCorner(up[2], right[2], back[0]);
+    //UBl
+    cubies[17] = fromColorToCorner(up[0], back[2], left[0]);
+    //DBR
+    cubies[18] = fromColorToCorner(down[8], back[6], right[8]);
+    //DBL
+    // for orientation purpose string generated as DLB
+    cubies[19] = fromColorToCorner(down[6], left[6], back[8]);
 
 	// get positions
-
 
 	for (int i = 0; i < 20; i++)
 	{
