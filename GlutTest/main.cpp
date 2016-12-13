@@ -546,7 +546,7 @@ void replay()
 void runNewCube() ;
 void startAnimation()
 {
-    if ( sol.empty() || runningAnimation || !cubeLoaded ) return ;
+    if ( runningAnimation || !cubeLoaded || currentStep == sol.size() ) return ;
     rotateStatus = sol[currentStep++] ;
     glutDetachMenu(GLUT_RIGHT_BUTTON);
     runningAnimation = true ;
