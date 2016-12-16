@@ -11,15 +11,22 @@ using namespace std;
 
 struct DataBlock
 {
-    shared_ptr<Cubies> node;
+    Cubies* node;
     unsigned char distance;
 
-    DataBlock() {}
+    DataBlock() {
+        node = nullptr ;
+    }
 
-    DataBlock(shared_ptr<Cubies> cbs, int dist)
+    DataBlock(Cubies* cbs, unsigned char dist)
     {
         node = cbs;
         distance = dist;
+    }
+    void clr()
+    {
+        if ( node != nullptr )
+            delete node ;
     }
 };
 
@@ -30,13 +37,21 @@ class Stack
     {
         struct Block *leftlink;
         DataBlock data[BLOCKSIZE];
+        Block()
+        {
+            leftlink = nullptr ;
+        }
+        ~Block()
+        {
+            delete leftlink ;
+        }
     };
 
     Block* rightblock;
     int rightindex; /* index into last block, points to last element */
 
 public:
-    long length;
+    long long length;
 
 
     Stack()
@@ -45,12 +60,12 @@ public:
         rightblock = nullptr;
     }
 
-    bool push(shared_ptr<Cubies> cbs, int dist)
+    bool push(Cubies* cbs, unsigned char dist)
     {
         if (rightblock == nullptr)
         {
             /* initialize */
-            rightblock = new Block;
+            rightblock = new Block();
             rightblock->leftlink = nullptr;
             length = 0;
             rightindex = -1;
@@ -59,7 +74,7 @@ public:
         {
             /* Needs a new block */
             Block* newblock = new Block;
-            newblock->leftlink =rightblock;
+            newblock->leftlink = rightblock;
             rightblock = newblock;
             rightindex = -1;
         }
@@ -82,11 +97,16 @@ public:
     {
         return rightblock->data[rightindex];
     }
+    bool release_pop()
+    {
 
-    bool pop()
+    }
+    Cubies* pop()
     {
         /* Just erase the last element */
+        assert(rightindex != -1) ;
         length--;
+        Cubies *current = rightblock->data[rightindex].node ;
         if (rightindex == 0)
         {
             /* Freeing an entire block */
@@ -99,13 +119,34 @@ public:
         {
             rightindex--;
         }
+        return current;
+    }
+    bool pop_clr()
+    {
+        /* Just erase the last element */
+        assert(rightindex != -1) ;
+        length--;
+        if (rightindex == 0)
+        {
+            rightblock->data[rightindex].clr() ;
+            /* Freeing an entire block */
+            Block* oldblock = rightblock;
+            rightblock = oldblock->leftlink;
+            delete oldblock;
+            rightindex = BLOCKSIZE - 1;
+        }
+        else
+        {
+            rightblock->data[rightindex].clr() ;
+            rightindex--;
+        }
         return true;
     }
-
     int size()
     {
         return length;
     }
+
 };
 
 #endif // STACK_H

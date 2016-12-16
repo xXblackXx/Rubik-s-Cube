@@ -20,7 +20,7 @@ void TableGenerator::EdgeTableGenerator(Byte* EDGE_TABLE, bool EdgeSet)
     Stack _stack;
 
     Cube c = Cube(solvedCube);
-    shared_ptr<Cubies> GoalCube = Cubies::Copy(c.toCubiesFromSides());
+    Cubies GoalCube = Cubies::Copy(c.toCubiesFromSides());
 
     int count = 0;
 
@@ -30,14 +30,14 @@ void TableGenerator::EdgeTableGenerator(Byte* EDGE_TABLE, bool EdgeSet)
 
 
     DataBlock current;
-    shared_ptr<Cubies> NextStates[20];
+    Cubies* NextStates[20];
 
     while (nodesCount < 42577920)
     {
         /* if stack is empty, go up a level */
         if (_stack.length == 0)
         {
-            _stack.push(GoalCube, 0);
+            _stack.push(&GoalCube, 0);
             depth++;
             /* clear out instack table */
             memset(instack, 255, 21288960);
@@ -118,8 +118,8 @@ void TableGenerator::EdgeTableGenerator(Byte* EDGE_TABLE, bool EdgeSet)
     }
 
 
-    if (EdgeSet) hash = GoalCube->GetEdge1Hash();
-    else hash = GoalCube->GetEdge2Hash();
+    if (EdgeSet) hash = GoalCube.GetEdge1Hash();
+    else hash = GoalCube.GetEdge2Hash();
 
     if (hash & 1) {
         /* zero out upper bits */
@@ -142,7 +142,7 @@ void TableGenerator::CornerTableGenerator(Byte* CORNER_TABLE)
     Stack _stack;
 
     Cube c = Cube(solvedCube);
-    shared_ptr<Cubies> GoalCube = Cubies::Copy(c.toCubiesFromSides());
+    Cubies GoalCube = Cubies::Copy(c.toCubiesFromSides());
 
     int count = 0;
 
@@ -152,7 +152,7 @@ void TableGenerator::CornerTableGenerator(Byte* CORNER_TABLE)
     {
         if (_stack.size() == 0)
         {
-            _stack.push(GoalCube, 0);
+            _stack.push(&GoalCube, 0);
             depth++;
             memset(instack, 255, 44089920);
         }
@@ -201,14 +201,14 @@ void TableGenerator::CornerTableGenerator(Byte* CORNER_TABLE)
             * not at depth yet, Generate Next States, applying heuristics pruning
             */
 
-            shared_ptr<Cubies> NextStates[20]; //= new shared_ptr<Cubies>[20];
+            Cubies* NextStates[20]; //= new shared_ptr<Cubies>[20];
 
             current.node->GenerateNextStates(NextStates);
 
 
             for (int i = 0; i < current.node->statesCount; i++)
             {
-                shared_ptr<Cubies> cbs = NextStates[i];
+                Cubies* cbs = NextStates[i];
 
                 hash = cbs->GetCornerHash();
 
