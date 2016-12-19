@@ -235,6 +235,7 @@ void Cubies::resetNext()
     statesCount = 0;
 }
 
+/*
 shared_ptr<Cubies> Cubies::Copy(shared_ptr<Cubies> b)
 {
     shared_ptr<Cubies> _st = shared_ptr<Cubies>(new Cubies());
@@ -247,10 +248,11 @@ shared_ptr<Cubies> Cubies::Copy(shared_ptr<Cubies> b)
     _st->SetPatternTables(b->PtrCornerTable, b->PtrEdge1Table, b->PtrEdge2Table);
     return _st;
 }
+*/
 
-shared_ptr<Cubies> Cubies::Copy(Cubies* b)
+Cubies* Cubies::Copy(Cubies* b)
 {
-    shared_ptr<Cubies> _st = shared_ptr<Cubies>(new Cubies());
+    Cubies* _st = new Cubies();
     for (int i = 0; i < 20; i++)
     {
         _st->positions[i] = b->positions[i];
@@ -261,30 +263,30 @@ shared_ptr<Cubies> Cubies::Copy(Cubies* b)
     return _st;
 }
 
-shared_ptr<Cubies> Cubies::Copy(Cubies b)
+Cubies Cubies::Copy(Cubies b)
 {
-    shared_ptr<Cubies> _st = shared_ptr<Cubies>(new Cubies());
+    Cubies _st ;
     for (int i = 0; i < 20; i++)
     {
-        _st->positions[i]=  b.positions[i];
-        _st->orientations[i] = b.orientations[i];
+        _st.positions[i]=  b.positions[i];
+        _st.orientations[i] = b.orientations[i];
     }
-    _st->lastOp = b.lastOp;
-    _st->SetPatternTables(b.PtrCornerTable, b.PtrEdge1Table, b.PtrEdge2Table);
+    _st.lastOp = b.lastOp;
+    _st.SetPatternTables(b.PtrCornerTable, b.PtrEdge1Table, b.PtrEdge2Table);
     return _st;
 }
 
-void Cubies::GenerateNextStates(shared_ptr<Cubies>* NextStates)
+void Cubies::GenerateNextStates(Cubies* NextStates[])
 {
     statesCount = 0;
     /* GENERATE CLOCKWISE MOVES */
 
     //Cubies* _st;
-    shared_ptr<Cubies> _st = Copy(this);
-
+    Cubies* _st ;
 
     if (lastOp == -1 || (!AvoidTable[lastOp][0]))
     {
+        _st = Copy(this);
         _st->clockCycle(moves::U);
         NextStates[statesCount++] = _st;
         _st->lastOp = 0;

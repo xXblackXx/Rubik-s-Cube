@@ -10,11 +10,12 @@ RubikSolver::~RubikSolver()
     //dtor
 }
 
-RubikSolver::RubikSolver(shared_ptr<Cubies> cbs)
+RubikSolver::RubikSolver(Cubies* cbs)
 {
 	goalState = Cube(solvedCube).toCubiesFromSides();
 	initialState = cbs;
 }
+
 
 bool RubikSolver::Solve()
 {
@@ -29,24 +30,25 @@ bool RubikSolver::Solve()
     path[0] = -1;
 
     DataBlock current;
-    shared_ptr<Cubies> NextStates[20];
-
+    Cubies* NextStates[20];
+    Cubies initi = *Cubies::Copy(initialState);
+    Cubies *deleted ;
+    //delete initialState ;
 	while (1)
 	{
 		if (_stack.length == 0)
 		{
 			if (Solved)
                 return true;
-
+            initialState = new Cubies(initi) ;
 			_stack.push(initialState, 0);
 			depth++;
 			printf("Searching depth %d, Nodes traversed: %ld\n", depth, popCount);
 		}
 
-		popCount++;
+    	popCount++;
 		current = _stack.top();
-		_stack.pop();
-
+        deleted = _stack.pop() ;
 		/* update the path array */
         if (current.distance > 0) {
             path[current.distance - 1] = current.node->lastOp;
@@ -69,7 +71,8 @@ bool RubikSolver::Solve()
                     i++;
                 }
                 actionLog[i] = -1;
-
+                while (_stack.size())
+                    _stack.pop_clr();
 				//actionLog = current.node->Solution;
 				break;
 			}
@@ -80,24 +83,32 @@ bool RubikSolver::Solve()
 			* not at depth yet, Generate Next States, applying heuristics pruning
 			*/
 
+
 			current.node->GenerateNextStates(NextStates);
+
 
             for (int i = 0; i < current.node->statesCount; i++)
                 for (int j = i + 1; j < current.node->statesCount; j++)
                     if (NextStates[i]->Heuristic() > NextStates[j]->Heuristic()) swap(NextStates[i], NextStates[j]);
 
-			for (int i = 0; i < current.node->statesCount; i++)
+            for (int i = 0; i < current.node->statesCount; i++)
 			{
-				shared_ptr<Cubies> cbs = NextStates[i];
+				Cubies* cbs = NextStates[i];
 
 				f = current.distance + cbs->Heuristic() + 1;
 
 				if (f > depth)
+                {
+                    delete cbs;
                     continue;
+                }
 
 				_stack.push(cbs, current.distance + 1);
 			}
-		}
-	}
+
+    	}
+	    delete deleted;
+        //_stack.pop_clr();
+    }
 	return false;
 }

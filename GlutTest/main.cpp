@@ -732,9 +732,9 @@ string readCubeFromFile()
 
 void Solve(string cubeStr)
 {
-
+    clock_t be = clock() ;
     Cube c = Cube(cubeStr);
-	shared_ptr<Cubies> cbs = Cubies::Copy(c.toCubiesFromSides());
+	Cubies cbs = Cubies::Copy(c.toCubiesFromSides());
 
     //for (int i = 0; i < 20; i++) cout << cbs->positions[i] << " \n"[i == 19];
     //for (int i = 0; i < 20; i++) cout << cbs->orientations[i] << " \n"[i == 19];
@@ -749,15 +749,16 @@ void Solve(string cubeStr)
 
     //shared_ptr<Cubies> cbs = Cubies::Copy(Cube::CubeFromMovesList(movs, 14));
 
-	cbs->SetPatternTables(CORNER_TABLE, EDGE1_TABLE, EDGE2_TABLE);
+	cbs.SetPatternTables(CORNER_TABLE, EDGE1_TABLE, EDGE2_TABLE);
 
 
-	RubikSolver solver(cbs);
+	RubikSolver solver(&cbs);
 
 	solver.Solve();
 
 	printSolution(solver.actionLog);
-
+    clock_t en = clock() ;
+    cout << (double)(en-be)/CLOCKS_PER_SEC;
 
 }
 

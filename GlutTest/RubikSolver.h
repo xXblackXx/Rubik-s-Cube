@@ -19,11 +19,11 @@ class RubikSolver
 {
 public:
     RubikSolver();
-    RubikSolver(shared_ptr<Cubies> cbs);
+    RubikSolver(Cubies* cbs);
     virtual ~RubikSolver();
 
     bool Solved = false;
-    shared_ptr<Cubies> initialState;
+    Cubies* initialState;
 
     short* actionLog;
 

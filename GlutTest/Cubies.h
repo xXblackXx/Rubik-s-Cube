@@ -41,14 +41,14 @@ class Cubies
 		bool HasNext();
 		void resetNext();
 		//shared_ptr<Cubies> NextState();
-		void GenerateNextStates(shared_ptr<Cubies>* NextStates);
+		void GenerateNextStates(Cubies* NextStates[]);
 
 		void SetPatternTables(Byte* CORNER_TABLE, Byte* EDGE1_TABLE, Byte* EDGE2_TABLE);
 
 
-		static shared_ptr<Cubies> Copy(shared_ptr<Cubies> b);
-		static shared_ptr<Cubies> Copy(Cubies* b);
-		static shared_ptr<Cubies> Copy(Cubies b);
+		//static Cubies Copy(Cubies* b);
+		static Cubies* Copy(Cubies* b);
+		static Cubies Copy(Cubies b);
 		int GetCornerHash();
 		int GetEdge1Hash();
 		int GetEdge2Hash();
