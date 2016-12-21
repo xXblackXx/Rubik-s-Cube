@@ -24,11 +24,8 @@ void TableGenerator::EdgeTableGenerator(Byte* EDGE_TABLE, bool EdgeSet)
 
     int countNodes = 0;
 
-    Byte* instack = new Byte[21288960];
-
 
     memset(EDGE_TABLE, 0, 21288960);
-
 
     DataBlock current;
     Cubies* NextStates[20];
@@ -41,8 +38,6 @@ void TableGenerator::EdgeTableGenerator(Byte* EDGE_TABLE, bool EdgeSet)
         {
             _stack.push(new Cubies(GoalCube), 0);
             depth++;
-            /* clear out instack table */
-            memset(instack, 255, 21288960);
         }
 
         /* Pop the first item off, put it in current */
@@ -54,7 +49,6 @@ void TableGenerator::EdgeTableGenerator(Byte* EDGE_TABLE, bool EdgeSet)
         if ((popcountNodes & 0777777) == 0777777)
             fprintf(stderr, "\r%d/42577920 hashed, on level:%d/10, total traversed:%d", nodescountNodes, depth, popcountNodes);
 
-        //if (popcountNodes > 1000000) return;
 
         currentNode->GenerateNextStates(NextStates);
 
@@ -63,22 +57,6 @@ void TableGenerator::EdgeTableGenerator(Byte* EDGE_TABLE, bool EdgeSet)
             if (EdgeSet) hashCube = NextStates[i]->GetEdge1Hash();
             else hashCube = NextStates[i]->GetEdge2Hash();
 
-            if (hashCube&1 ? \
-                    ((instack[(hashCube-1)/2] >> 4) <= (current.distance+1)) : \
-                    ((instack[hashCube/2] & 15) <= (current.distance+1))) {
-                continue;
-            }
-            /* add to instack */
-            if (hashCube&1)
-            {
-                instack[(hashCube-1)/2] &= 15;
-                instack[(hashCube-1)/2] |= (current.distance+1) << 4;
-            }
-            else
-            {
-                instack[hashCube/2] &= 15<<4;
-                instack[hashCube/2] |= (current.distance+1);
-            }
             if (current.distance + 1 == depth)
             {
                 /*
@@ -126,8 +104,6 @@ void TableGenerator::EdgeTableGenerator(Byte* EDGE_TABLE, bool EdgeSet)
 
     }
 
-
-
     if (EdgeSet) hashCube = GoalCube.GetEdge1Hash();
     else hashCube = GoalCube.GetEdge2Hash();
 
@@ -155,7 +131,6 @@ void TableGenerator::CornerTableGenerator(Byte* CORNER_TABLE)
 
     int countNodes = 0;
 
-    Byte* instack = new Byte[44089920];
     memset(CORNER_TABLE, 0, 44089920);
     Cubies * currentNode ;
     DataBlock current ;
@@ -165,7 +140,6 @@ void TableGenerator::CornerTableGenerator(Byte* CORNER_TABLE)
         {
             _stack.push(&GoalCube, 0);
             depth++;
-            memset(instack, 255, 44089920);
         }
 
         popcountNodes++;
@@ -221,25 +195,6 @@ void TableGenerator::CornerTableGenerator(Byte* CORNER_TABLE)
             {
 
                 hashCube = NextStates[i]->GetCornerHash();
-
-                if (hashCube & 1 ? \
-                        ((instack[(hashCube - 1) / 2] >> 4) <= (current.distance + 1)) : \
-                        ((instack[hashCube / 2] & 15) <= (current.distance + 1)))
-                {
-                    continue;
-                }
-                /* add to instack */
-                if (hashCube & 1)
-                {
-                    instack[(hashCube - 1) / 2] &= 15;
-                    instack[(hashCube - 1) / 2] |= (current.distance + 1) << 4;
-                }
-                else
-                {
-                    instack[hashCube / 2] &= 15 << 4;
-                    instack[hashCube / 2] |= (current.distance + 1);
-                }
-
                 Cubies* cbs = new Cubies(*NextStates[i]);
                 /* Add to real stack */
                 _stack.push(cbs, current.distance + 1);
