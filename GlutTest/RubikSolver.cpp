@@ -51,7 +51,7 @@ bool RubikSolver::Solve()
         deleted = _stack.pop() ;
 		/* update the path array */
         if (current.distance > 0) {
-            path[current.distance - 1] = current.node->lastOp;
+            path[current.distance - 1] = deleted->lastOp;
             path[current.distance] = -1;
         }
 
@@ -60,7 +60,7 @@ bool RubikSolver::Solve()
 			/*
 			*  if the cube is at current depth goal, check if it's solved.
 			*/
-			if (current.node->isSolved())
+			if (deleted->isSolved())
 			{
 				Solved = true;
 				actionLog = new short[30];
@@ -74,6 +74,11 @@ bool RubikSolver::Solve()
                 while (_stack.size())
                     _stack.pop_clr();
 				//actionLog = current.node->Solution;
+                for ( int i = 0 ; i < deleted->statesCount ; i++ )
+                    delete NextStates[i] ;
+                delete deleted;
+                delete []NextStates ;
+
 				break;
 			}
 		}
@@ -84,16 +89,16 @@ bool RubikSolver::Solve()
 			*/
 
 
-			current.node->GenerateNextStates(NextStates);
+			deleted->GenerateNextStates(NextStates);
+            if ( depth > 13 )
+                for (int i = 0; i < deleted->statesCount; i++)
+                    for (int j = i + 1; j < deleted->statesCount; j++)
+                        if (NextStates[i]->Heuristic() < NextStates[j]->Heuristic()) swap(NextStates[i], NextStates[j]);
 
 
-            for (int i = 0; i < current.node->statesCount; i++)
-                for (int j = i + 1; j < current.node->statesCount; j++)
-                    if (NextStates[i]->Heuristic() > NextStates[j]->Heuristic()) swap(NextStates[i], NextStates[j]);
-
-            for (int i = 0; i < current.node->statesCount; i++)
+            for (int i = 0; i < deleted->statesCount; i++)
 			{
-				Cubies* cbs = NextStates[i];
+				Cubies* cbs = new Cubies(*NextStates[i]);
 
 				f = current.distance + cbs->Heuristic() + 1;
 
@@ -107,7 +112,10 @@ bool RubikSolver::Solve()
 			}
 
     	}
+    	for ( int i = 0 ; i < deleted->statesCount ; i++ )
+            delete NextStates[i] ;
 	    delete deleted;
+        delete []NextStates ;
         //_stack.pop_clr();
     }
 	return false;

@@ -18,7 +18,7 @@ struct DataBlock
         node = nullptr ;
     }
 
-    DataBlock(Cubies* cbs, unsigned char dist)
+    DataBlock(Cubies* cbs, int dist)
     {
         node = cbs;
         distance = dist;
@@ -51,7 +51,7 @@ class Stack
     int rightindex; /* index into last block, points to last element */
 
 public:
-    long long length;
+    long length;
 
 
     Stack()
@@ -60,7 +60,7 @@ public:
         rightblock = nullptr;
     }
 
-    bool push(Cubies* cbs, unsigned char dist)
+    bool push(Cubies* cbs, int dist)
     {
         if (rightblock == nullptr)
         {
