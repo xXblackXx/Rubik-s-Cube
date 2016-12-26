@@ -982,7 +982,7 @@ void runCamera()
     constructFaces(cubeStr) ;
     Solve(cubeStr) ;
     timer = time(0) ;
-
+    runningAnimation = false;
 
     return ;
 }
