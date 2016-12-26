@@ -36,8 +36,7 @@ bool RubikSolver::Solve()
     int dist ;
     int statesCount ;
 
-    //delete initialState ;
-	while (1)
+    while (1)
 	{
 		if (_stack.length == 0)
 		{
@@ -46,7 +45,7 @@ bool RubikSolver::Solve()
             initialState = new Cubies(initi) ;
 			_stack.push(initialState, 0);
 			depth++;
-			printf("Searching depth %d, Nodes traversed: %ld\n", depth, popCount);
+			printf("Searching depth %d\n", depth);
 		}
 
     	popCount++;
@@ -58,7 +57,6 @@ bool RubikSolver::Solve()
             path[dist - 1] = deleted->lastOp;
             path[dist] = -1;
         }
-
 		if (dist == depth)
 		{
 			/*
@@ -89,7 +87,6 @@ bool RubikSolver::Solve()
 			* not at depth yet, Generate Next States, applying heuristics pruning
 			*/
 
-
 			deleted->GenerateNextStates(NextStates);
             statesCount = deleted->statesCount ;
 
@@ -113,14 +110,14 @@ bool RubikSolver::Solve()
 
 				_stack.push(cbs, dist + 1);
 			}
-
             for ( int i = 0 ; i < statesCount ; i++ )
                 delete NextStates[i] ;
-            delete []NextStates ;
-    	}
 
+
+    	}
 	    delete deleted;
 
     }
-	return false;
+
+    return false;
 }
