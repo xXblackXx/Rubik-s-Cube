@@ -887,7 +887,7 @@ string getColorName(int color)
         return "Orange";
     }
 }
-void drawPridected(Mat imgOriginal)
+void drawPredicted(Mat imgOriginal)
 {
     for ( int i = 0 ; i < 9 ; i++ )
     {
@@ -975,7 +975,7 @@ void runCamera()
         Mat h ;
         cvtColor(imgOriginal,h,CV_RGB2HSV) ;
         readColors(imgOriginal) ;
-        drawPridected(imgOriginal) ;
+        drawPredicted(imgOriginal) ;
         imshow("Original", imgOriginal); //show the original image
         int keyPressed = waitKey(30) ;
         if (keyPressed == 27) // 'esc' key press
