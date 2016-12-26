@@ -780,18 +780,6 @@ void Solve(string cubeStr)
     Cube c = Cube(cubeStr);
     Cubies cbs = Cubies::Copy(c.toCubiesFromSides());
 
-    //for (int i = 0; i < 20; i++) cout << cbs->positions[i] << " \n"[i == 19];
-    //for (int i = 0; i < 20; i++) cout << cbs->orientations[i] << " \n"[i == 19];
-
-    // 16 MOVES
-    //string movs[] = {"B", "F", "U", "B", "U", "B2", "D2", "L", "F2", "R2", "B", "F", "D'", "R'", "B'", "F"};
-
-    // 5 MOVES
-    //string movs[] = { "D'", "U'", "R", "L'", "D'" };
-    // 14 MOVES
-    //string movs[] = {"U'", "L'", "R'", "B", "F'", "D'", "U", "L", "R'", "U", "L2", "F2", "L2", "B2" };
-
-    //shared_ptr<Cubies> cbs = Cubies::Copy(Cube::CubeFromMovesList(movs, 14));
 
     cbs.SetPatternTables(CORNER_TABLE, EDGE1_TABLE, EDGE2_TABLE);
 
@@ -918,7 +906,6 @@ void readColors(Mat imgOriginal)
             }
         ColorsVecs[i] /= cntPix ;
     }
-        cout << ColorsVecs[4][0] << " " << ColorsVecs[4][1] << " " << ColorsVecs[4][2] << " " << endl;
 }
 void runCamera()
 {
