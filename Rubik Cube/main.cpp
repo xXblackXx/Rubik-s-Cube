@@ -850,12 +850,12 @@ void drawRectangles(Mat imgOriginal)
 int getColorFromVec(int index)
 {
     int R = ColorsVecs[index][2] , G = ColorsVecs[index][1] , B = ColorsVecs[index][0] ;
-    if ( B >= R && B >= G  && B-G <= 50 ) return e_White ;
-    if ( B >= R && B >= G ) return e_Blue ;
-    if ( abs(R-G) <= 20) return e_Yellow ;
-    if ( G >= B && G >= R ) return e_Green ;
+    if ( B >= R && B >= G && B-G >= 50 ) return e_Blue ;
+    if ( abs(R-G) <= 30 && G-B >= 50) return e_Yellow ;
+    if ( R >= G && G >= B) return e_Orange ;
     if ( R >= B && B >= G ) return e_Red ;
-    return e_Orange ;
+    if ( G >= B && G >= R ) return e_Green ;
+    return e_White ;
 }
 string getColorName(int color)
 {
@@ -972,8 +972,17 @@ void runCamera()
         }
         else if (keyPressed == 13) // 'enter' key press
         {
-            cout << getFaceStr() << endl;
+            //cout << ColorsVecs[4][0] << " " << ColorsVecs[4][1] << " " << ColorsVecs[4][2] << endl;
             cubeStr += getFaceStr() ;
+            cout << cubeStr << "\n" ;
+        }
+        else if (keyPressed == 8) //backspace
+        {
+            if ( cubeStr.size() )
+            {
+                cubeStr = cubeStr.substr(0,cubeStr.size()-9) ;
+                cout << cubeStr << "\n" ;
+            }
         }
         if ( cubeStr.size() == 54 ) break;
     }
