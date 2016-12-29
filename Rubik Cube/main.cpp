@@ -48,8 +48,12 @@ int rotateSpeed = 1;
 int rotationsCount[2] = { 1, 3 } ;
 time_t timer = 0 ;
 bool runningAnimation = false ; // for visualization
+bool solving = false ;
+bool runningCamera = false ;
 double rotateAngel = 0 ;
-
+thread *solveThread = NULL ;
+thread *cameraThread = NULL ;
+string cubeStr ;
 
 void changeSize(int w, int h)
 {
@@ -88,17 +92,17 @@ void changeSize(int w, int h)
 float positions[27][3] =
 {
     /* first slide */
-    { 0, 0, 0   }, { 1.1, 0, 0   }, { 2.2, 0, 0 },
-    { 0, 1.1, 0   }, { 1.1, 1.1, 0   }, { 2.2, 1.1, 0 },
-    { 0, 2.2, 0   }, { 1.1, 2.2, 0   }, { 2.2, 2.2, 0 },
+    { 0.0, 0.0, 0.0 }, { 1.1, 0.0, 0.0 }, { 2.2, 0.0, 0.0 },
+    { 0.0, 1.1, 0.0 }, { 1.1, 1.1, 0.0 }, { 2.2, 1.1, 0.0 },
+    { 0.0, 2.2, 0.0 }, { 1.1, 2.2, 0.0 }, { 2.2, 2.2, 0.0 },
     /* second slide */
-    { 0, 0, 1.1 }, { 1.1, 0, 1.1 }, { 2.2, 0, 1.1 },
-    { 0, 1.1, 1.1 }, { 1.1, 1.1, 1.1 }, { 2.2, 1.1, 1.1 },
-    { 0, 2.2, 1.1 }, { 1.1, 2.2, 1.1 }, { 2.2, 2.2, 1.1 },
+    { 0.0, 0.0, 1.1 }, { 1.1, 0.0, 1.1 }, { 2.2, 0.0, 1.1 },
+    { 0.0, 1.1, 1.1 }, { 1.1, 1.1, 1.1 }, { 2.2, 1.1, 1.1 },
+    { 0.0, 2.2, 1.1 }, { 1.1, 2.2, 1.1 }, { 2.2, 2.2, 1.1 },
     /* third slide */
-    { 0, 0, 2.2 }, { 1.1, 0, 2.2 }, { 2.2, 0, 2.2 },
-    { 0, 1.1, 2.2 }, { 1.1, 1.1, 2.2 }, { 2.2, 1.1, 2.2 },
-    { 0, 2.2, 2.2 }, { 1.1, 2.2, 2.2 }, { 2.2, 2.2, 2.2 },
+    { 0.0, 0.0, 2.2 }, { 1.1, 0.0, 2.2 }, { 2.2, 0.0, 2.2 },
+    { 0.0, 1.1, 2.2 }, { 1.1, 1.1, 2.2 }, { 2.2, 1.1, 2.2 },
+    { 0.0, 2.2, 2.2 }, { 1.1, 2.2, 2.2 }, { 2.2, 2.2, 2.2 },
 };
 struct cube
 {
@@ -128,47 +132,47 @@ int getColorOfChar( char c )
     }
     assert(false) ;
 }
-void constructFaces(std::string s)
+void constructFaces()
 {
 #ifndef Up
     {
         for ( int j = 0 ; j < 3 ; j++ )
             for ( int k = 0 ; k < 3 ; k++ )
-                cubes[6+j*9+k].sideColor[e_Up] = getColorOfChar(s[j*3+k]) ;
+                cubes[6+j*9+k].sideColor[e_Up] = (j*3+k < cubeStr.size() ? getColorOfChar(cubeStr[j*3+k]) : e_White) ;
     }
 #endif
 #ifndef front
     {
         for ( int j = 0 ; j < 3 ; j++ )
             for ( int k = 0 ; k < 3 ; k++ )
-                cubes[24-j*3+k].sideColor[e_Front] = getColorOfChar(s[j*3+k+9]) ;
+                cubes[24-j*3+k].sideColor[e_Front] = (j*3+k+9 < cubeStr.size() ? getColorOfChar(cubeStr[j*3+k+9]) : e_White) ;
     }
 #endif
 #ifndef Down
     {
         for ( int j = 0 ; j < 3 ; j++ )
             for ( int k = 0 ; k < 3 ; k++ )
-                cubes[j*9+k].sideColor[e_Down] = getColorOfChar(s[24-j*3+k]) ;
+                cubes[j*9+k].sideColor[e_Down] = (24-j*3+k < cubeStr.size() ? getColorOfChar(cubeStr[24-j*3+k]) : e_White) ;
     }
 #endif
 #ifndef back
     {
         for ( int j = 0 ; j < 9 ; j++ )
-            cubes[j].sideColor[e_Back] = getColorOfChar(s[35-j]) ;
+            cubes[j].sideColor[e_Back] = (35-j < cubeStr.size() ? getColorOfChar(cubeStr[35-j])  : e_White);
     }
 #endif
 #ifndef right
     {
         for ( int j = 0 ; j < 3 ; j++ )
             for ( int k = 0 ; k < 3 ; k++ )
-                cubes[26-j*3-k*9].sideColor[e_Right] = getColorOfChar(s[j*3+k+36]) ;
+                cubes[26-j*3-k*9].sideColor[e_Right] = (j*3+k+36 < cubeStr.size() ? getColorOfChar(cubeStr[j*3+k+36]) : e_White) ;
     }
 #endif
 #ifndef left
     {
         for ( int j = 0 ; j < 3 ; j++ )
             for ( int k = 0 ; k < 3 ; k++ )
-                cubes[6-j*3+k*9].sideColor[e_Left] = getColorOfChar(s[j*3+k+45]) ;
+                cubes[6-j*3+k*9].sideColor[e_Left] = (j*3+k+45 < cubeStr.size() ? getColorOfChar(cubeStr[j*3+k+45]) : e_White) ;
     }
 #endif
 }
@@ -511,7 +515,7 @@ void drawCube()
 int currentStep = 0 ; // in solution steps
 vector<int> sol; // solution step
 
-void Solve(string tmp ) ;
+void Solve() ;
 void InitApp();
 
 void renderScene(void)
@@ -558,13 +562,12 @@ void renderScene(void)
 
 
 
-string cubeStr ;
 void replay()
 {
     if ( runningAnimation || !cubeLoaded ) return ;
     currentStep = 0 ;
     timer = time(0) ;
-    constructFaces(cubeStr) ;
+    constructFaces() ;
 }
 
 void runNewCube() ;
@@ -580,7 +583,7 @@ void runCamera() ;
 void pressNormalKey(unsigned char key, int xx, int yy)
 {
     if ( runningAnimation ) return ;
-
+    if ( solving ) return ;
     switch (key)
     {
     case 'r' :
@@ -601,7 +604,7 @@ void pressNormalKey(unsigned char key, int xx, int yy)
         break;
     case 'c' :
     case 'C' :
-        runCamera() ;
+        cameraThread = new thread(runCamera) ;
         break;
     }
 }
@@ -758,6 +761,10 @@ void ExitApp()
     delete[] CORNER_TABLE;
     delete[] EDGE1_TABLE;
     delete[] EDGE2_TABLE;
+    if ( solveThread != NULL )
+        solveThread->join() ;
+    if ( cameraThread != NULL )
+        cameraThread->join() ;
     exit(0) ;
 }
 string readCubeFromFile()
@@ -774,8 +781,9 @@ string readCubeFromFile()
     return "goroyrorgwgyrrbrwbboobwrrgbgbogooyywrbwwgwwwoyggybybyy" ;
 }
 
-void Solve(string cubeStr)
+void Solve()
 {
+    solving = true ;
     clock_t be = clock() ;
     Cube c = Cube(cubeStr);
     Cubies cbs = Cubies::Copy(c.toCubiesFromSides());
@@ -791,7 +799,7 @@ void Solve(string cubeStr)
     printSolution(solver.actionLog);
     clock_t en = clock() ;
     printf("Time in seconds : %.4f\n",(double)(en-be)/CLOCKS_PER_SEC) ;
-
+    solving = false ;
 }
 
 void runNewCube()
@@ -801,8 +809,9 @@ void runNewCube()
     sol.clear() ;
     currentStep = 0 ;
     cubeStr = readCubeFromFile() ;
-    constructFaces(cubeStr) ;
-    Solve(cubeStr) ;
+    constructFaces() ;
+    solveThread = new thread(Solve) ;
+//    Solve() ;
     timer = time(0) ;
 }
 
@@ -852,9 +861,9 @@ int getColorFromVec(int index)
     int R = ColorsVecs[index][2] , G = ColorsVecs[index][1] , B = ColorsVecs[index][0] ;
     if ( B >= R && B >= G && B-G >= 50 ) return e_Blue ;
     if ( abs(R-G) <= 30 && G-B >= 50) return e_Yellow ;
-    if ( R >= G && G >= B) return e_Orange ;
+    if ( R >= G && G >= B && R-B >= 40) return e_Orange ;
     if ( R >= B && B >= G ) return e_Red ;
-    if ( G >= B && G >= R ) return e_Green ;
+    if ( G >= B && G >= R && G-R >= 40 ) return e_Green ;
     return e_White ;
 }
 string getColorName(int color)
@@ -913,6 +922,7 @@ void runCamera()
     if ( runningAnimation ) return ;
     if ( !cubeLoaded ) cubeLoaded = true ;
     runningAnimation = true ;
+    runningCamera = true ;
     sol.clear() ;
     currentStep = 0 ;
     cubeStr = "" ;
@@ -972,24 +982,27 @@ void runCamera()
         }
         else if (keyPressed == 13) // 'enter' key press
         {
-            //cout << ColorsVecs[4][0] << " " << ColorsVecs[4][1] << " " << ColorsVecs[4][2] << endl;
+            cout << ColorsVecs[4][0] << " " << ColorsVecs[4][1] << " " << ColorsVecs[4][2] << endl;
             cubeStr += getFaceStr() ;
+            constructFaces() ;
             cout << cubeStr << "\n" ;
         }
         else if (keyPressed == 8) //backspace
         {
-            if ( cubeStr.size() )
+            if ( !cubeStr.empty() )
             {
                 cubeStr = cubeStr.substr(0,cubeStr.size()-9) ;
                 cout << cubeStr << "\n" ;
             }
+            constructFaces() ;
         }
         if ( cubeStr.size() == 54 ) break;
     }
     destroyWindow("Original") ;
     cout <<cubeStr << endl;
-    constructFaces(cubeStr) ;
-    Solve(cubeStr) ;
+//    constructFaces() ;
+    solveThread = new thread(Solve) ;
+  //  Solve(cubeStr) ;
     timer = time(0) ;
     runningAnimation = false;
 
@@ -997,9 +1010,7 @@ void runCamera()
 }
 int main(int argc, char **argv)
 {
-    //thread t1(cam) ;
-    //t1.join() ;
-    //return 0 ;
+
     /*
     TableGenerator tg;
     FILE *output;
