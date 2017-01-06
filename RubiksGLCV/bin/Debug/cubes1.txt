@@ -1,0 +1,20 @@
+05: brbwrwgrgoboowoygwbygooobygrgrryrybwygwygwrbrybwybwogo (~20 ms -> ~10ms -> ~5ms)
+
+10: bbgyrobggrorywwwwygggyorbbbrrrwyyywwwbyrgoogoygwobrobo (~24 ms)
+
+12: wgyorwgyyoggrwgorrbbbboyyobbogryorwgogorgywbyrbwybwrww (~230 ms)
+
+13: bgwwwwrrwwwgbbbbbbyyyyyyyyyrwwggggggobbrrrrrroogoooooo (~5 secs)
+13: goroyrorgwgyrrbrwbboobwrrgbgbogooyywrbwwgwwwoyggybybyy (~9 secs -> 2.4 secs -> 1.2 sec)
+bbgyrobggrorywwwwygggyorbbbrrrwyyywwwbyrgoogoygwobrobo
+14: yrwoygogrywwbrbrrowgwowrrrrgwgooyyyygyoygwbbbobbobwggb (3 mins -> 44 secs -> 7 secs -> 4.5 secs -> 3.8 sec)
+14: wgoorrwbogwyowrrogyyrrorbbyyyroywbywgybwgbwgrbgogbwobg (~16 secs -> ~14.8 secs)
+14: ygorrywbggrrywgbogobywoybyrgobgywbbwwoywgrrrwrwoobgoby (~32 secs -> ~ 30 secs -> ~ 28 secs)
+14: owgyrorrryyybwgbbroywrogorboowwybwwgbgwwgbgyrbogrboygy (~57 secs -> ~55 secs -> ~50.5 secs)
+
+15: rorooobogowowwwwwwyyyyyyyyygrbrrrrrrwgoggggggobwbbbbbb (~402 secs)
+15: wrborwoowbgrywbgyyrrbgoyowgobobywrogbryygwrgwgbwgboyry (~556 secs -> ~474 secs)
+15: owyrywoyyyobbrbbgorogywgwwyggwyorgorrbrrgrwyobgbwbogbw (~986 secs -> ~945 secs)
+
+16: wyooyrrgwgoborrywwoboywrbwgyoryowygyogbygggbrbbwrbwrbg (unsolvable -> ~135 mins)
+16: boyoyrrggwwyrrgbygobobwbwrrryogoowwgrybrgyywgwgbwbbooy (unsolvable -> ~158 mins)

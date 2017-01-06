@@ -1,0 +1,91 @@
+# depslib dependency file v1.0
+1483686790 source:f:\trojan\projects\rubiksglcv\main.cpp
+	<stdlib.h>
+	<math.h>
+	<iostream>
+	<iomanip>
+	<cassert>
+	<thread>
+	"PatternDatabase.h"
+	"Utility.h"
+	"Cubies.h"
+	"cube.h"
+	"RubikSolver.h"
+	"TableGenerator.h"
+	<opencv2/opencv.hpp>
+	"opencv2/highgui/highgui.hpp"
+	"opencv2/imgproc/imgproc.hpp"
+	<opencv2/core/core.hpp>
+	<GLUT/glut.h>
+	<GL/glut.h>
+
+1483686598 f:\trojan\projects\rubiksglcv\patterndatabase.h
+	"Utility.h"
+
+1482333816 f:\trojan\projects\rubiksglcv\utility.h
+	<bits/stdc++.h>
+	<iostream>
+	<stdio.h>
+
+1483687250 f:\trojan\projects\rubiksglcv\cubies.h
+	"utility.h"
+	<vector>
+	<memory>
+	<math.h>
+	<algorithm>
+
+1483628286 f:\trojan\projects\rubiksglcv\cube.h
+	<iostream>
+	<string>
+	"face.h"
+	"utility.h"
+	"Cubies.h"
+
+1480768560 f:\trojan\projects\rubiksglcv\face.h
+	<iostream>
+	"utility.h"
+
+1483286488 f:\trojan\projects\rubiksglcv\rubiksolver.h
+	"Cube.h"
+	"Cubies.h"
+	"Utility.h"
+	"Stack.h"
+	<vector>
+	<stack>
+	<math.h>
+	<algorithm>
+	<memory>
+
+1483687887 f:\trojan\projects\rubiksglcv\stack.h
+	"Cubies.h"
+	<memory>
+
+1483686814 f:\trojan\projects\rubiksglcv\tablegenerator.h
+	"Cube.h"
+	"Cubies.h"
+	"Utility.h"
+	"Stack.h"
+	<vector>
+	<stack>
+	<math.h>
+	<algorithm>
+	<memory>
+
+1483628825 source:f:\trojan\projects\rubiksglcv\cube.cpp
+	"cube.h"
+
+1483687223 source:f:\trojan\projects\rubiksglcv\cubies.cpp
+	"Cubies.h"
+
+1480775920 source:f:\trojan\projects\rubiksglcv\face.cpp
+	"Face.h"
+
+1483562496 source:f:\trojan\projects\rubiksglcv\rubiksolver.cpp
+	"RubikSolver.h"
+
+1480965374 source:f:\trojan\projects\rubiksglcv\stack.cpp
+	"Stack.h"
+
+1483687672 source:f:\trojan\projects\rubiksglcv\tablegenerator.cpp
+	"TableGenerator.h"
+
