@@ -50,7 +50,7 @@ void TableGenerator::EdgeTableGenerator(Byte* EDGE_TABLE, bool EdgeSet)
             fprintf(stderr, "\r%d/42577920 hashed, on level:%d/10, total traversed:%d", nodescountNodes, depth, popcountNodes);
 
 
-        currentNode->GenerateNextStates(NextStates);
+        currentNode->GenerateNextStates(NextStates, 25 );
 
         for (int i = 0; i < currentNode->statesCount; i++)
         {
@@ -190,7 +190,7 @@ void TableGenerator::CornerTableGenerator(Byte* CORNER_TABLE)
 
             Cubies* NextStates[20]; //= new shared_ptr<Cubies>[20];
 
-            currentNode->GenerateNextStates(NextStates);
+            currentNode->GenerateNextStates(NextStates, 25);
 
 
             for (int i = 0; i < currentNode->statesCount; i++)

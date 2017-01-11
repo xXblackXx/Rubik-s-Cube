@@ -11,6 +11,7 @@ Cube::~Cube() {}
 
 void Cube::strToCube(string s)
 {
+    internalCubeString = s;
 	int i = 0;
 	center[0] = s[i + 4];
 	up = Face(s.substr(i, 9));
@@ -43,35 +44,28 @@ string Cube::fromCubiesToCubeString(Cubies& cubie)
     string cube = cubie.toStringOfFaces();
     string tmp = "";
     cube = faceLetterToColor(cube);
-
     // put colors in the correct face
     // up front down back right left
-
     // up
            tmp += cube[39] + cube[12] + cube[36] + cube[10]
                 + center[0]
                 + cube[8] + cube[28] + cube[1] + cube[5];
-
     // front
            tmp += cube[27] + cube[0] + cube[24] + cube[6]
                 + center[1]
                 + cube[4] + cube[33] + cube[2] + cube[30];
-
     // down
            tmp += cube[34] + cube[3] + cube[31] + cube[16]
                 + center[2]
                 + cube[14] + cube[45] + cube[18] + cube[42];
-
     // back
            tmp += cube[37] + cube[13] + cube[40] + cube[20]
                 + center[3]
                 + cube[22] + cube[43] + cube[19] + cube[46];
-
     // right
            tmp += cube[26] + cube[9] + cube[38] + cube[5]
                 + center[4]
                 + cube[21] + cube[32] + cube[15] + cube[44];
-
     // left
            tmp += cube[41] + cube[11] + cube[29] + cube[23]
                 + center[5]
@@ -130,6 +124,41 @@ bool Cube::isSolved()
 {
 	Cube c(solvedCube);
 	return (*this == c);
+}
+
+bool Cube::isSolvable()
+{
+    int gc = 0, rc = 0, bc = 0, yc = 0, wc = 0, oc = 0;
+
+    for (int i= 0; i < internalCubeString.size(); i++)
+    {
+        if (internalCubeString[i] == 'w') wc++;
+        if (internalCubeString[i] == 'y') yc++;
+        if (internalCubeString[i] == 'g') gc++;
+        if (internalCubeString[i] == 'b') bc++;
+        if (internalCubeString[i] == 'r') rc++;
+        if (internalCubeString[i] == 'o') oc++;
+    }
+
+    bool solv = true;
+
+    if (gc != 9 || rc != 9 || bc != 9 || yc != 9 || wc != 9 || oc != 9) solv = false;
+
+
+    Cubies cbs = Cubies::Copy(toCubiesFromSides());
+
+    int Eparity = 0, Cparity = 0;
+
+    for (int i = 0; i < 12; i++)
+        Eparity += (!(cbs.orientations[i] == 0));
+    if (Eparity%2 != 0) solv = false;
+
+
+    //for (int i = 12; i < 18; i++)
+        //Cparity += cbs.orientations[i];
+    //if (Cparity%3 != 0) solv = false;
+
+    return solv;
 }
 
 

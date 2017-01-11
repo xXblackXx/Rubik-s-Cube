@@ -33,9 +33,10 @@ bool RubikSolver::Solve()
     Cubies* NextStates[20];
     Cubies initi = *Cubies::Copy(initialState);
     Cubies *deleted ;
+    Cubies *cbs ;
     int dist ;
     int statesCount ;
-
+    int index , index2 ;
     while (1)
 	{
 		if (_stack.length == 0)
@@ -66,13 +67,13 @@ bool RubikSolver::Solve()
 			{
 				Solved = true;
 				actionLog = new short[30];
-				int i = 0;
-				while (path[i] != -1)
+                index = 0;
+				while (path[index] != -1)
                 {
-                    actionLog[i] = path[i];
-                    i++;
+                    actionLog[index] = path[index];
+                    index++;
                 }
-                actionLog[i] = -1;
+                actionLog[index] = -1;
                 while (_stack.size())
                     _stack.pop_clr();
 				//actionLog = current.node->Solution;
@@ -87,32 +88,21 @@ bool RubikSolver::Solve()
 			* not at depth yet, Generate Next States, applying heuristics pruning
 			*/
 
-			deleted->GenerateNextStates(NextStates);
+			deleted->GenerateNextStates(NextStates,depth-dist-1);
             statesCount = deleted->statesCount ;
 
-            //if ( depth > 13 )
-                for (int i = 0; i < statesCount; i++)
-                    for (int j = i + 1; j < statesCount; j++)
-                        if (NextStates[i]->Heuristic() < NextStates[j]->Heuristic()) swap(NextStates[i], NextStates[j]);
+            for (index = 0; index < statesCount; index++)
+            {
+                for (index2 = index + 1; index2 < statesCount; index2++)
+                    if (NextStates[index]->Heuristic() < NextStates[index2]->Heuristic())
+                    {
+                        cbs = NextStates[index] ;
+                        NextStates[index] = NextStates[index2] ;
+                        NextStates[index2] = cbs ;
+                    }
 
-
-            for (int i = 0; i < statesCount; i++)
-			{
-				Cubies* cbs = new Cubies(*NextStates[i]);
-
-				f = dist + cbs->Heuristic() + 1;
-
-				if (f > depth)
-                {
-                    delete cbs;
-                    continue;
-                }
-
-				_stack.push(cbs, dist + 1);
-			}
-            for ( int i = 0 ; i < statesCount ; i++ )
-                delete NextStates[i] ;
-
+				_stack.push(NextStates[index], dist + 1);
+            }
 
     	}
 	    delete deleted;

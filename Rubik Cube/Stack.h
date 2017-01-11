@@ -5,7 +5,7 @@
 
 #include <memory>
 
-#define BLOCKSIZE 10000
+#define BLOCKSIZE_STACK 10000
 
 using namespace std;
 
@@ -36,7 +36,7 @@ class Stack
     struct Block
     {
         struct Block *leftlink;
-        DataBlock data[BLOCKSIZE];
+        DataBlock data[BLOCKSIZE_STACK];
         Block()
         {
             leftlink = nullptr ;
@@ -70,7 +70,7 @@ public:
             length = 0;
             rightindex = -1;
         }
-        else if (rightindex == BLOCKSIZE-1)
+        else if (rightindex == BLOCKSIZE_STACK-1)
         {
             /* Needs a new block */
             Block* newblock = new Block;
@@ -113,7 +113,7 @@ public:
             Block* oldblock = rightblock;
             rightblock = oldblock->leftlink;
             delete oldblock;
-            rightindex = BLOCKSIZE - 1;
+            rightindex = BLOCKSIZE_STACK - 1;
         }
         else
         {
@@ -133,7 +133,7 @@ public:
             Block* oldblock = rightblock;
             rightblock = oldblock->leftlink;
             delete oldblock;
-            rightindex = BLOCKSIZE - 1;
+            rightindex = BLOCKSIZE_STACK - 1;
         }
         else
         {

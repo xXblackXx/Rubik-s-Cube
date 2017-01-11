@@ -41,17 +41,32 @@ class Cubies
 		bool HasNext();
 		void resetNext();
 		//shared_ptr<Cubies> NextState();
-		void GenerateNextStates(Cubies* NextStates[]);
-
+		void GenerateNextStates(Cubies* NextStates[], short needed);
+		void TableGenerateNextStates(Cubies* NextStates[]);
 		void SetPatternTables(Byte* CORNER_TABLE, Byte* EDGE1_TABLE, Byte* EDGE2_TABLE);
 
 
 		//static Cubies Copy(Cubies* b);
-		static Cubies* Copy(Cubies* b);
-		static Cubies Copy(Cubies b);
+		static inline Cubies* Copy(Cubies* b)
+		{
+		    Cubies* _st = new Cubies();
+            memcpy((void*)_st, (void*)b, sizeof(Cubies));
+
+            return _st;
+		}
+		static inline Cubies Copy(Cubies b)
+		{
+		    Cubies _st ;
+            memcpy((void*)&_st, (void*)&b, sizeof(Cubies));
+
+            return _st;
+		}
 		int GetCornerHash();
 		int GetEdge1Hash();
 		int GetEdge2Hash();
+
+		int GetCornerOrientationHash();
+		int GetEdgesOrientationHash();
     protected:
     private:
         int HeuristicValue;
