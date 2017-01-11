@@ -24,6 +24,7 @@ class Cube
 
 		void toSolved();
 		bool isSolved();
+		bool isSolvable();
 
 		Face getFace(FaceName f);
 		FaceName getActualFace(FaceName f);
@@ -47,6 +48,7 @@ class Cube
 		Cubies toCubiesFromSides();
 		static Cubies CubeFromMovesList(string* moveList, int len);
     private:
+        string internalCubeString;
         Face up, down, front, back, right, left;
         string order = "UDFBRL";
         char center[6];

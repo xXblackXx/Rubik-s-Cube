@@ -1,3 +1,27 @@
+/*
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+                        This work is based on
+    "Finding Optimal Solutions to Rubik's Cube Using Pattern Databases"
+                        by Dr.Richard E. Korf
+                    Computer Science Department
+                University of California, Los Angeles
+         http://www.aaai.org/Papers/AAAI/1997/AAAI97-109.pdf
+    Great Thanks To Andrew Brown <brownan@gmail.com> solver (2009) For his
+    insightful work / comments that helped a lot with finishing this project.
+                Faculty Of Computer & Information Sciences
+                Algorithms Analysis & Design Course Project
+                                Fall 2016
+*/
+
+
+
 #include <stdlib.h>
 #include <math.h>
 #include <iostream>
@@ -35,22 +59,22 @@ enum rotateVectorEnum { e_LeftClockRightCounter, e_LeftCounterRightClock, e_UpCo
 enum rotateCountEnum { e_ClockRotationCount, e_CounterRotationCount };
 enum rotateSpeedEnum { e_NormalSpeed, e_FastSpeed};
 enum sides { e_Front, e_Back, e_Left, e_Right, e_Up, e_Down };
-enum cubeColors { e_Red, e_Blue, e_Yellow, e_Green, e_White, e_Orange };
+enum cubeColors { e_Red, e_Blue, e_Yellow, e_Green, e_White, e_Orange, e_Grey };
 int rotateStatus = 0 ;
 bool cubeLoaded = false ;
 
-float colorsRGB[6][3] =
+float colorsRGB[7][3] =
 {
-    { 1,0,0 }, { 0,0,1 }, { 1,1,0 }, { 0,1,0 }, { 1,1,1 }, { 1,0.5,0 }
+    { 1,0,0 }, { 0,0,1 }, { 1,1,0 }, { 0,1,0 }, { 1,1,1 }, { 1,0.5,0 } , { 0.1,0.1,0.1 }
 };
-float rotationSpeeds[2] = {1, 3 } ;
-int rotateSpeed = 1;
+float rotationSpeeds[2] = {0.0625, 3 } ;
+int rotateSpeed = 0;
 int rotationsCount[2] = { 1, 3 } ;
 time_t timer = 0 ;
 bool runningAnimation = false ; // for visualization
 bool solving = false ;
 bool runningCamera = false ;
-double rotateAngel = 0 ;
+double rotateangle = 0 ;
 thread *solveThread = NULL ;
 thread *cameraThread = NULL ;
 string cubeStr ;
@@ -138,41 +162,41 @@ void constructFaces()
     {
         for ( int j = 0 ; j < 3 ; j++ )
             for ( int k = 0 ; k < 3 ; k++ )
-                cubes[6+j*9+k].sideColor[e_Up] = (j*3+k < cubeStr.size() ? getColorOfChar(cubeStr[j*3+k]) : e_White) ;
+                cubes[6+j*9+k].sideColor[e_Up] = (j*3+k < cubeStr.size() ? getColorOfChar(cubeStr[j*3+k]) : e_Grey) ;
     }
 #endif
 #ifndef front
     {
         for ( int j = 0 ; j < 3 ; j++ )
             for ( int k = 0 ; k < 3 ; k++ )
-                cubes[24-j*3+k].sideColor[e_Front] = (j*3+k+9 < cubeStr.size() ? getColorOfChar(cubeStr[j*3+k+9]) : e_White) ;
+                cubes[24-j*3+k].sideColor[e_Front] = (j*3+k+9 < cubeStr.size() ? getColorOfChar(cubeStr[j*3+k+9]) : e_Grey) ;
     }
 #endif
 #ifndef Down
     {
         for ( int j = 0 ; j < 3 ; j++ )
             for ( int k = 0 ; k < 3 ; k++ )
-                cubes[j*9+k].sideColor[e_Down] = (24-j*3+k < cubeStr.size() ? getColorOfChar(cubeStr[24-j*3+k]) : e_White) ;
+                cubes[j*9+k].sideColor[e_Down] = (24-j*3+k < cubeStr.size() ? getColorOfChar(cubeStr[24-j*3+k]) : e_Grey) ;
     }
 #endif
 #ifndef back
     {
         for ( int j = 0 ; j < 9 ; j++ )
-            cubes[j].sideColor[e_Back] = (35-j < cubeStr.size() ? getColorOfChar(cubeStr[35-j])  : e_White);
+            cubes[j].sideColor[e_Back] = (35-j < cubeStr.size() ? getColorOfChar(cubeStr[35-j])  : e_Grey);
     }
 #endif
 #ifndef right
     {
         for ( int j = 0 ; j < 3 ; j++ )
             for ( int k = 0 ; k < 3 ; k++ )
-                cubes[26-j*3-k*9].sideColor[e_Right] = (j*3+k+36 < cubeStr.size() ? getColorOfChar(cubeStr[j*3+k+36]) : e_White) ;
+                cubes[26-j*3-k*9].sideColor[e_Right] = (j*3+k+36 < cubeStr.size() ? getColorOfChar(cubeStr[j*3+k+36]) : e_Grey) ;
     }
 #endif
 #ifndef left
     {
         for ( int j = 0 ; j < 3 ; j++ )
             for ( int k = 0 ; k < 3 ; k++ )
-                cubes[6-j*3+k*9].sideColor[e_Left] = (j*3+k+45 < cubeStr.size() ? getColorOfChar(cubeStr[j*3+k+45]) : e_White) ;
+                cubes[6-j*3+k*9].sideColor[e_Left] = (j*3+k+45 < cubeStr.size() ? getColorOfChar(cubeStr[j*3+k+45]) : e_Grey) ;
     }
 #endif
 }
@@ -465,7 +489,7 @@ void drawCube()
         if ( isRotatedIndex(i) )
         {
             glTranslatef(1.1,1.1,1.1);
-            glRotated(rotateAngel,ATV(rotateVector[getRotateVector()]));
+            glRotated(rotateangle,ATV(rotateVector[getRotateVector()]));
             glTranslatef(-1.1,-1.1,-1.1);
         }
         glTranslatef(ATV(positions[i]));
@@ -504,7 +528,7 @@ void drawCube()
     }
     if ( rotateStatus )
     {
-        rotateAngel += getRotationSpeed() ;
+        rotateangle += getRotationSpeed() ;
         timer = time(0) ;
     }
 
@@ -514,7 +538,8 @@ void drawCube()
 
 int currentStep = 0 ; // in solution steps
 vector<int> sol; // solution step
-
+double cameraXpos , cameraYpos, cameraZpos[2] = {10.0,-10.0}, radius = 10.0*sqrtl(2), rAngleLR = acos(-1)/4.0;
+int cameraZposChoice = 0 ;
 void Solve() ;
 void InitApp();
 
@@ -526,11 +551,11 @@ void renderScene(void)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Reset transformations
-    if ( rotateAngel < 0 ) rotateAngel += 360 ;
-    if ( rotateAngel == 90 + getRotationSpeed() || rotateAngel == 270-getRotationSpeed() )
+    if ( rotateangle < 0 ) rotateangle += 360 ;
+    if ( rotateangle == 90 + getRotationSpeed() || rotateangle == 270-getRotationSpeed() )
     {
         rotateFace() ;
-        rotateAngel = 0 ;
+        rotateangle = 0 ;
         rotateStatus = e_None ;
         if ( runningAnimation )
         {
@@ -545,10 +570,20 @@ void renderScene(void)
     glLoadIdentity();
     // Set the camera
 
+    /*
     gluLookAt(	10.0f, 10.0f, 10.0f,
                 0.38194f, 0.0f,  0.951643f,
                 0.0f, 1.0f,  0.0f);
+    */
 
+    if ( rAngleLR > acos(-1) * 2.0 ) rAngleLR -= acos(-1) * 2.0 ;
+    if ( rAngleLR < 0 ) rAngleLR += acos(-1) * 2.0 ;
+    cameraXpos = cos(rAngleLR)*radius ;
+    cameraYpos = sin(rAngleLR)*radius ;
+
+    gluLookAt(	cameraXpos   , cameraZpos[cameraZposChoice], cameraYpos,
+                1.1f         , 1.1f , 1.1f,
+                0.0f         , 1.0f ,  0.0f);
     //0.38194 0.951643
 
     glPushMatrix();
@@ -564,7 +599,8 @@ void renderScene(void)
 
 void replay()
 {
-    if ( runningAnimation || !cubeLoaded ) return ;
+    if ( runningAnimation || !cubeLoaded ) return ;rAngleLR = acos(-1)/4.0 ;
+    cameraZposChoice = 0 ;
     currentStep = 0 ;
     timer = time(0) ;
     constructFaces() ;
@@ -580,6 +616,24 @@ void startAnimation()
 }
 void ExitApp();
 void runCamera() ;
+
+void pressSpecialKeys(int key, int xx, int yy) {
+
+	switch (key) {
+		case GLUT_KEY_LEFT :
+			rAngleLR -= 0.05f;
+			break;
+		case GLUT_KEY_RIGHT :
+			rAngleLR += 0.05f;
+			break;
+		case GLUT_KEY_UP :
+		    cameraZposChoice = 0 ;
+		    break;
+		case GLUT_KEY_DOWN :
+		    cameraZposChoice = 1 ;
+			break;
+	}
+}
 void pressNormalKey(unsigned char key, int xx, int yy)
 {
     if ( runningAnimation ) return ;
@@ -786,6 +840,14 @@ void Solve()
     solving = true ;
     clock_t be = clock() ;
     Cube c = Cube(cubeStr);
+
+    if (!c.isSolvable())
+    {
+        cout << "Invalid Cube!!" << endl;
+        solving = false;
+        return;
+    }
+
     Cubies cbs = Cubies::Copy(c.toCubiesFromSides());
 
 
@@ -806,17 +868,22 @@ void runNewCube()
 {
     if ( runningAnimation ) return ;
     if ( !cubeLoaded ) cubeLoaded = true ;
+    rAngleLR = acos(-1)/4.0 ;
+    cameraZposChoice = 0 ;
     sol.clear() ;
     currentStep = 0 ;
     cubeStr = readCubeFromFile() ;
     constructFaces() ;
     solveThread = new thread(Solve) ;
-//    Solve() ;
+
     timer = time(0) ;
 }
 
+
 Point RecsPoints[9][2] ;
-Vec3i ColorsVecs[9] ;
+Vec3i ColorsVecs[9];
+Vec3i ColorsVecsH[9];
+
 void initRecsPoints( Mat imgOriginal)
 {
     double midW = imgOriginal.cols /2 ;
@@ -858,13 +925,30 @@ void drawRectangles(Mat imgOriginal)
 
 int getColorFromVec(int index)
 {
+
     int R = ColorsVecs[index][2] , G = ColorsVecs[index][1] , B = ColorsVecs[index][0] ;
-    if ( B >= R && B >= G && B-G >= 50 ) return e_Blue ;
+    //int H = ColorsVecsH[index][0] , S = ColorsVecsH[index][1] , V = ColorsVecsH[index][2] ;
+
+    //cout << "RBG: " << R << " " << B << " "<< G << endl;
+    //cout << "HSV: " << H << " " << S << " "<< V << endl;
+
+    if ( abs(B-G) <= 30 && abs(B-R) <= 30 && abs(R-G) <= 30 ) return e_White ;
     if ( abs(R-G) <= 30 && G-B >= 50) return e_Yellow ;
-    if ( R >= G && G >= B && R-B >= 40) return e_Orange ;
-    if ( R >= B && B >= G ) return e_Red ;
+    if ( R >= G && G >= B && R-B >= 40 && abs(B-G) > 20) return e_Orange ;
+    if ( R >= B && R >= G && abs(B-G) <= 20 ) return e_Red ;
     if ( G >= B && G >= R && G-R >= 40 ) return e_Green ;
-    return e_White ;
+    return e_Blue ;
+
+    /*
+
+    if (S < 80) return e_White;
+    if (S > 160 && H > 110) return e_Red;
+    if (G > 135 && R > 135 && S > 125) return e_Yellow;
+    if (B > 140 && H < 50) return e_Blue;
+    if (H > 85) return e_Orange;
+    else return e_Green;
+
+    */
 }
 string getColorName(int color)
 {
@@ -916,17 +1000,35 @@ void readColors(Mat imgOriginal)
         ColorsVecs[i] /= cntPix ;
     }
 }
+void readColorsH(Mat imgOriginal)
+{
+    for ( int i = 0 ; i < 9 ; i++ )
+    {
+        ColorsVecsH[i] = {0,0,0};
+        int cntPix = 0 ;
+        for ( double j = RecsPoints[i][0].x ; j < RecsPoints[i][1].x ; j++ )
+            for ( double k = RecsPoints[i][0].y ; k < RecsPoints[i][1].y ; k++ )
+            {
+                cntPix++ ;
+                ColorsVecsH[i] += imgOriginal.at<Vec3b>(Point(j,k)) ;
+            }
+        ColorsVecsH[i] /= cntPix ;
+    }
+}
+
 void runCamera()
 {
 
     if ( runningAnimation ) return ;
     if ( !cubeLoaded ) cubeLoaded = true ;
+    rAngleLR = acos(-1)/4.0 ;
+    cameraZposChoice = 0 ;
     runningAnimation = true ;
     runningCamera = true ;
     sol.clear() ;
     currentStep = 0 ;
     cubeStr = "" ;
-
+    constructFaces() ;
 
     VideoCapture cap(0); //capture the video from webcam
 
@@ -961,16 +1063,11 @@ void runCamera()
             break;
         }
 
-        // Mat grayIMG;
-
-        //cvtColor(imgOriginal, grayIMG, CV_BGR2GRAY); //Convert the captured frame from BGR to HSV
-
-        //Mat cany ;
-        //Canny(imgOriginal,cany,50,100) ;
         flip(imgOriginal,imgOriginal,1) ;
         drawRectangles(imgOriginal) ;
-        Mat h ;
-        cvtColor(imgOriginal,h,CV_RGB2HSV) ;
+        Mat hsv ;
+        cvtColor(imgOriginal,hsv,CV_RGB2HSV) ;
+        readColorsH(hsv) ;
         readColors(imgOriginal) ;
         drawPredicted(imgOriginal) ;
         imshow("Original", imgOriginal); //show the original image
@@ -982,7 +1079,7 @@ void runCamera()
         }
         else if (keyPressed == 13) // 'enter' key press
         {
-            cout << ColorsVecs[4][0] << " " << ColorsVecs[4][1] << " " << ColorsVecs[4][2] << endl;
+            if ( cubeStr.size() == 54 ) break;
             cubeStr += getFaceStr() ;
             constructFaces() ;
             cout << cubeStr << "\n" ;
@@ -996,13 +1093,11 @@ void runCamera()
             }
             constructFaces() ;
         }
-        if ( cubeStr.size() == 54 ) break;
     }
     destroyWindow("Original") ;
-    cout <<cubeStr << endl;
-//    constructFaces() ;
+
     solveThread = new thread(Solve) ;
-  //  Solve(cubeStr) ;
+
     timer = time(0) ;
     runningAnimation = false;
 
@@ -1011,33 +1106,7 @@ void runCamera()
 int main(int argc, char **argv)
 {
 
-    /*
-    TableGenerator tg;
-    FILE *output;
-    output = fopen("table_edge2.newTable", "w");
-    tg.EdgeTableGenerator(EDGE2_TABLE,false);
-    int written;
-    written = fwrite(EDGE2_TABLE, 1, 21288960, output); //21288960
-    fclose(output);
-    cout << written << endl;
-
-    return 0;
-    */
     InitApp();
-    // runNewCube();
-    // 16 moves new
-    // boyoyrrggwwyrrgbygobobwbwrrryogoowwgrybrgyywgwgbwbbooy
-    //16 moves
-    //string cubeStr = "wyooyrrgwgoborrywwoboywrbwgyoryowygyogbygggbrbbwrbwrbg";
-    //15 moves
-    // owyrywoyyyobbrbbgorogywgwwyggwyorgorrbrrgrwyobgbwbogbw
-    //14 moves
-    //yrwoygogrywwbrbrrowgwowrrrrgwgooyyyygyoygwbbbobbobwggb
-    // 13 moves
-    //string cubeStr = "goroyrorgwgyrrbrwbboobwrrgbgbogooyywrbwwgwwwoyggybybyy";
-    //5 moves
-    //string cubeStr = "brbwrwgrgoboowoygwbygooobygrgrryrybwygwygwrbrybwybwogo";
-
 
     // init GLUT and create window
     glutInit(&argc, argv);
@@ -1050,10 +1119,11 @@ int main(int argc, char **argv)
     glutDisplayFunc(renderScene);
     glutReshapeFunc(changeSize);
     glutIdleFunc(renderScene);
+
+    glutIgnoreKeyRepeat(0);
+
     glutKeyboardFunc(pressNormalKey) ;
-
-    glutIgnoreKeyRepeat(1);
-
+	glutSpecialFunc(pressSpecialKeys);
 
     // OpenGL init
     glEnable(GL_DEPTH_TEST);
